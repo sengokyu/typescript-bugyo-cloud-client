@@ -4,7 +4,6 @@
   "description": "Bugyo Cloud Client",
   "main": "dist/index.js",
   "scripts": {
-    "prepare": "tsc",
     "build": "tsc",
     "test": "jest"
   },
