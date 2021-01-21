@@ -1,5 +1,36 @@
 # TypeScript BUGYO Cloud Client
 
+# Usage
+
+```js
+// Create tasks
+const loginTask = new bcc.LoginTask({ loginId, password });
+const punchTask = new bcc.PunchTask({ clockType: "ClockIn" });
+const logoutTask = new bcc.LogoutTask();
+
+// Do tasks
+await client.doA(loginTask); // At first, must do login
+await client.doA(punchTask);
+await client.doA(logoutTask);
+```
+
+See a [sample](/scripts/sample.js).
+
+# Testing
+
+```bash
+npm test
+```
+
+# Running a sample
+
+```bash
+npm run sample TenantCode LoginId Password
+```
+
+
+
+
 # 画面あるいはAPI
 
 ## 認証画面
