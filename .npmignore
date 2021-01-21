@@ -1,6 +1,9 @@
-jest.config.ts
+jest.config.js
 src/
 __tests__/
-__mockes__/
+__mocks__/
 __helpers__/
+scripts/
 tsconfig.json
+.eslintrc.json
+.node-version
