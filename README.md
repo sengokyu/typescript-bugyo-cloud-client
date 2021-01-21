@@ -102,3 +102,7 @@
 
 
 
+## ログアウト
+
+* URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/calllogout/logout/?manuallogin=True
+* METHOD: GET
