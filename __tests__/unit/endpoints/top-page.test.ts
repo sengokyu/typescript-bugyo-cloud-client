@@ -41,9 +41,13 @@ describe("TopPage", () => {
     const actual = await instance.invoke(client, url);
 
     // Then
-    expect(axios.get).toHaveBeenCalledWith(url, {
-      maxRedirects: 0,
-    });
+    expect(axios.get).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        maxRedirects: 0,
+        baseURL: "https://hromssp.obc.jp/",
+      })
+    );
     expect(actual).toBe("yyy");
   });
 
@@ -75,7 +79,10 @@ describe("TopPage", () => {
     await instance.invoke(client, url1);
 
     // Then
-    const expectedConfig = { maxRedirects: 0 };
+    const expectedConfig = expect.objectContaining({
+      maxRedirects: 0,
+      baseURL: "https://hromssp.obc.jp/",
+    });
     expect(axios.get).toHaveBeenCalledWith(url1, expectedConfig);
     expect(axios.get).toHaveBeenCalledWith(url2, expectedConfig);
     expect(axios.get).toHaveBeenCalledWith(url3, expectedConfig);
