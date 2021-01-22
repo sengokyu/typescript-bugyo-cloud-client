@@ -24,7 +24,7 @@ export abstract class TokenPage extends BaseEndpoint {
 
     this.throwIfNgStatus(resp);
 
-    this.logger.info("TokenPage succeed : %s", url);
+    this.logger.info("%s succeed.", this.EndpointName);
 
     return parseToken(resp.data);
   }
