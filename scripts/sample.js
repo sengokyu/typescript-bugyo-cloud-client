@@ -2,8 +2,6 @@
 
 const bcc = require("../dist");
 
-bcc.LoggerFactory.options.level = "trace";
-
 if (process.argv.length < 3) {
   console.log("Usage: sample tenant-code login-id password");
   process.exit();
