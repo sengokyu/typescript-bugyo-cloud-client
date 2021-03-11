@@ -6,7 +6,10 @@ import { TopPage } from "../../../src/endpoints/top-page";
 import { AuthInfo } from "../../../src/models/auth-info";
 import { ClientParam } from "../../../src/models/client-param";
 import { LoginTask } from "../../../src/tasks/login-task";
-import { mockEndpointImplementation } from "../../../__helpers__/mock-helper";
+import {
+  mockEndpointImplementation,
+  mockLoggerFactory,
+} from "../../../__helpers__/mock-helper";
 
 jest.mock("../../../src/endpoints/login-page");
 jest.mock("../../../src/endpoints/check-authentication-method");
@@ -19,6 +22,8 @@ const AuthenticateMock = Authenticate as jest.Mock<Authenticate>;
 const TopPageMock = TopPage as jest.Mock<TopPage>;
 
 describe("LoginTask", () => {
+  const loggerFactory = mockLoggerFactory();
+
   beforeEach(() => {
     // Clear all instances
     LoginPageMock.mockClear();
@@ -32,7 +37,7 @@ describe("LoginTask", () => {
     const authInfo = ({} as unknown) as AuthInfo;
 
     // When
-    const instance = new LoginTask(authInfo);
+    const instance = new LoginTask(authInfo, loggerFactory);
 
     // Then
     expect(instance).toBeInstanceOf(LoginTask);
@@ -49,7 +54,7 @@ describe("LoginTask", () => {
     const token = "login page token";
     const url = "https://example.com/uuu";
     const userCode = "uuuuu";
-    const instance = new LoginTask(authInfo);
+    const instance = new LoginTask(authInfo, loggerFactory);
     const loginPageInvoke = mockEndpointImplementation(LoginPageMock);
     const authenticateInvoke = mockEndpointImplementation(AuthenticateMock);
     const topPageInvoke = mockEndpointImplementation(TopPageMock);

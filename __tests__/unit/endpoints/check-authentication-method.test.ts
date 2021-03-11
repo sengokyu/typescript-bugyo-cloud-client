@@ -3,8 +3,11 @@ import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CheckAuthenticationMethod } from "../../../src/endpoints/check-authentication-method";
 import { AuthInfo } from "../../../src/models/auth-info";
 import { ClientParam } from "../../../src/models/client-param";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("CheckAuthenticationMethod", () => {
+  const loggerFactory = mockLoggerFactory();
+
   it("LOGIN IDをPOSTします", async () => {
     // Given
     const tenantCode = "ttt";
@@ -15,7 +18,7 @@ describe("CheckAuthenticationMethod", () => {
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
-    const instance = new CheckAuthenticationMethod();
+    const instance = new CheckAuthenticationMethod(loggerFactory);
 
     // When
     const actualPromise = instance.invoke(client, token, authInfo);
@@ -51,7 +54,7 @@ describe("CheckAuthenticationMethod", () => {
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
-    const instance = new CheckAuthenticationMethod();
+    const instance = new CheckAuthenticationMethod(loggerFactory);
 
     // When
     const actualPromise = instance.invoke(client, token, authInfo);

@@ -2,6 +2,7 @@ import axios, { AxiosStatic } from "axios";
 import { ClientParam } from "../../../dist/models/client-param";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { TopPage } from "../../../src/endpoints/top-page";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 // 何回もリクエストするため、jest-mock-axiosは使わず、自前でやる
 jest.mock("axios");
@@ -9,6 +10,8 @@ jest.mock("axios");
 const axiosMock = (axios as unknown) as jest.Mock<AxiosStatic>;
 
 describe("TopPage", () => {
+  const loggerFactory = mockLoggerFactory();
+
   beforeEach(() => {
     axiosMock.mockClear();
   });
@@ -16,7 +19,7 @@ describe("TopPage", () => {
   it("create instance", () => {
     // Given
     // When
-    const actual = new TopPage();
+    const actual = new TopPage(loggerFactory);
 
     // Then
     expect(actual).toBeInstanceOf(TopPage);
@@ -29,7 +32,7 @@ describe("TopPage", () => {
     const client = ({ param, session } as unknown) as BugyoCloudClient;
     const url = "https://example.com/top";
     const responseUrl = "https://example.com/xxx/yyy/ddd";
-    const instance = new TopPage();
+    const instance = new TopPage(loggerFactory);
 
     (axios.get as jest.Mock).mockResolvedValue({
       status: 200,
@@ -64,7 +67,7 @@ describe("TopPage", () => {
     const resp2 = { status: 302, headers: { location: url3 }, data: "" };
     const resp3 = { status: 200, config: { url: topUrl }, data: "" };
     const urlRespMap: { [index: string]: any } = {};
-    const instance = new TopPage();
+    const instance = new TopPage(loggerFactory);
 
     urlRespMap[url1] = resp1;
     urlRespMap[url2] = resp2;

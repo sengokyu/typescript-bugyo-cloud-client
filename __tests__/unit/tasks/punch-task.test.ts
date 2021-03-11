@@ -4,7 +4,10 @@ import { TimeClock } from "../../../src/endpoints/time-clock";
 import { ClientParam } from "../../../src/models/client-param";
 import { PunchInfo } from "../../../src/models/punch-info";
 import { PunchTask } from "../../../src/tasks/punch-task";
-import { mockEndpointImplementation } from "../../../__helpers__/mock-helper";
+import {
+  mockEndpointImplementation,
+  mockLoggerFactory,
+} from "../../../__helpers__/mock-helper";
 
 jest.mock("../../../src/endpoints/punchmark-page");
 jest.mock("../../../src/endpoints/time-clock");
@@ -13,6 +16,8 @@ const PunchmarkPageMock = PunchmarkPage as jest.Mock<PunchmarkPage>;
 const TimeClockMock = TimeClock as jest.Mock<TimeClock>;
 
 describe("PunchTask", () => {
+  const loggerFactory = mockLoggerFactory();
+
   beforeEach(() => {
     // Clear all instances
     PunchmarkPageMock.mockClear();
@@ -24,7 +29,7 @@ describe("PunchTask", () => {
     const punchInfo = {} as PunchInfo;
 
     // When
-    const instance = new PunchTask(punchInfo);
+    const instance = new PunchTask(punchInfo, loggerFactory);
 
     // Then
     expect(instance).toBeInstanceOf(PunchTask);
@@ -40,7 +45,7 @@ describe("PunchTask", () => {
     const timeClockInvoke = mockEndpointImplementation(TimeClockMock);
     const token = "my token";
     const punchInfo = {} as PunchInfo;
-    const instance = new PunchTask(punchInfo);
+    const instance = new PunchTask(punchInfo, loggerFactory);
 
     punchmarkPageInvoke.mockResolvedValue(token);
 

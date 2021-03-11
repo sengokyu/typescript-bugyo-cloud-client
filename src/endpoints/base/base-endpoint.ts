@@ -1,11 +1,13 @@
 import { AxiosResponse } from "axios";
 import { BugyoCloudClientError } from "../../bugyo-cloud-client";
-import { LoggerFactory } from "../../utils/logger-factory";
+import { Logger, LoggerFactory } from "../../utils/logger-factory";
 
 export abstract class BaseEndpoint {
-  protected readonly logger = LoggerFactory.getLogger(
-    this["constructor"]["name"]
-  );
+  protected readonly logger: Logger;
+
+  constructor(loggerFactory: LoggerFactory) {
+    this.logger = loggerFactory.getLogger(this["constructor"]["name"]);
+  }
 
   protected throwIfNgStatus(resp: AxiosResponse): void {
     if (resp.status !== 200) {

@@ -1,9 +1,13 @@
 import mockAxios from "jest-mock-axios";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
+import { TimeClock } from "../../../src/endpoints/time-clock";
 import { ClientParam } from "../../../src/models/client-param";
 import { PunchInfo } from "../../../src/models/punch-info";
-import { TimeClock } from "../../../src/endpoints/time-clock";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+
 describe("TimeClock", () => {
+  const loggerFactory = mockLoggerFactory();
+
   afterEach(() => {
     mockAxios.reset();
   });
@@ -19,7 +23,7 @@ describe("TimeClock", () => {
     const punchInfo: PunchInfo = {
       clockType: "ClockIn",
     };
-    const instance = new TimeClock();
+    const instance = new TimeClock(loggerFactory);
 
     // When
     const actualPromise = instance.invoke(client, token, punchInfo);

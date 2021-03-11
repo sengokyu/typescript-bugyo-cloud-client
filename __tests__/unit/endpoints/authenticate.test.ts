@@ -3,8 +3,11 @@ import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { Authenticate } from "../../../src/endpoints/authenticate";
 import { AuthInfo } from "../../../src/models/auth-info";
 import { ClientParam } from "../../../src/models/client-param";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("Authenticate", () => {
+  const loggerFactory = mockLoggerFactory();
+
   afterEach(() => {
     mockAxios.reset();
   });
@@ -19,7 +22,7 @@ describe("Authenticate", () => {
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
-    const instance = new Authenticate();
+    const instance = new Authenticate(loggerFactory);
     const url = "hoge hoge";
 
     // When

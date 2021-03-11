@@ -4,16 +4,21 @@ import { CheckAuthenticationMethod } from "../endpoints/check-authentication-met
 import { LoginPage } from "../endpoints/login-page";
 import { TopPage } from "../endpoints/top-page";
 import { AuthInfo } from "../models/auth-info";
-import { LoggerFactory } from "../utils/logger-factory";
+import { Logger, LoggerFactory } from "../utils/logger-factory";
 import { BaseTask } from "./base/base-task";
 
 /**
  * ログイン実行します。
  */
 export class LoginTask implements BaseTask {
-  private readonly logger = LoggerFactory.getLogger(LoginTask.name);
+  private readonly logger: Logger;
 
-  constructor(private authInfo: AuthInfo) {}
+  constructor(
+    private authInfo: AuthInfo,
+    private loggerFactory: LoggerFactory
+  ) {
+    this.logger = loggerFactory.getLogger(LoginTask.name);
+  }
 
   async execute(client: BugyoCloudClient): Promise<void> {
     this.logger.trace("Trying to get the login page token.");
@@ -26,28 +31,36 @@ export class LoginTask implements BaseTask {
   }
 
   private getLoginPageToken(client: BugyoCloudClient): Promise<string> {
-    return new LoginPage().invoke(client);
+    return new LoginPage(this.loggerFactory).invoke(client);
   }
 
   private checkAuthMethod(
     client: BugyoCloudClient,
     token: string
   ): Promise<void> {
-    return new CheckAuthenticationMethod().invoke(client, token, this.authInfo);
+    return new CheckAuthenticationMethod(this.loggerFactory).invoke(
+      client,
+      token,
+      this.authInfo
+    );
   }
 
   private authenticate(
     client: BugyoCloudClient,
     token: string
   ): Promise<string> {
-    return new Authenticate().invoke(client, token, this.authInfo);
+    return new Authenticate(this.loggerFactory).invoke(
+      client,
+      token,
+      this.authInfo
+    );
   }
 
   private async setupUserCode(
     client: BugyoCloudClient,
     url: string
   ): Promise<void> {
-    const topPage = new TopPage();
+    const topPage = new TopPage(this.loggerFactory);
     const userCode = await topPage.invoke(client, url);
 
     this.logger.debug("UserCode retrieved.", userCode);

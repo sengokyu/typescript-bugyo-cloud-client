@@ -2,8 +2,11 @@ import mockAxios from "jest-mock-axios";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { PunchmarkPage } from "../../../src/endpoints/punchmark-page";
 import { ClientParam } from "../../../src/models/client-param";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("PunchmarkPage", () => {
+  const loggerFactory = mockLoggerFactory();
+
   afterEach(() => {
     mockAxios.reset();
   });
@@ -15,7 +18,7 @@ describe("PunchmarkPage", () => {
     const param: ClientParam = { tenantCode, userCode };
     const session = mockAxios;
     const client = ({ param, session } as unknown) as BugyoCloudClient;
-    const instance = new PunchmarkPage();
+    const instance = new PunchmarkPage(loggerFactory);
     const data = `
     <form action="http://example.com/">
     <input name="__RequestVerificationToken" value="my token">
