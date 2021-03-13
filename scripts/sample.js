@@ -7,14 +7,25 @@ if (process.argv.length < 3) {
   process.exit();
 }
 
+const loggerFactory = {
+  getLogger() {
+    return {
+      trace: console.log,
+      debug: console.log,
+      info: console.log,
+      error: console.log,
+    };
+  },
+};
+
 const main = async () => {
   const password = process.argv.pop();
   const loginId = process.argv.pop();
   const tenantCode = process.argv.pop();
 
-  const loginTask = new bcc.LoginTask({ loginId, password });
-  const punchTask = new bcc.PunchTask({ clockType: "ClockIn" });
-  const logoutTask = new bcc.LogoutTask();
+  const loginTask = new bcc.LoginTask({ loginId, password }, loggerFactory);
+  const punchTask = new bcc.PunchTask({ clockType: "ClockIn" }, loggerFactory);
+  const logoutTask = new bcc.LogoutTask(loggerFactory);
 
   const client = new bcc.BugyoCloudClient(tenantCode);
 

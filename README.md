@@ -3,15 +3,21 @@
 # Usage
 
 ```js
+// Implement LoggerFactory
+const loggerFactory = {
+  getLogger(name) {
+    // (snip)
+  }
+};
 // Settings
 const tenantCode = "Bugyo cloud tenant code";
 const loginId = "Your login id";
 const password = "Your password";
 
 // Create tasks
-const loginTask = new bcc.LoginTask({ loginId, password });
-const punchTask = new bcc.PunchTask({ clockType: "ClockIn" });
-const logoutTask = new bcc.LogoutTask();
+const loginTask = new bcc.LoginTask({ loginId, password }, loggerFactory);
+const punchTask = new bcc.PunchTask({ clockType: "ClockIn" }, loggerFactory);
+const logoutTask = new bcc.LogoutTask(loggerFactory);
 
 // Create a client
 const client = new bcc.BugyoCloudClient(tenantCode);
