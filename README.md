@@ -28,7 +28,7 @@ await client.doA(punchTask);
 await client.doA(logoutTask);
 ```
 
-See a [sample](/scripts/sample.js).
+See a [sample](/samples/clock-in.js).
 
 # Testing
 
