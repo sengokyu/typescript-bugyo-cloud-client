@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import axiosCookieJarSupport from "axios-cookiejar-support";
+import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { USER_AGENT } from "./config";
 import { ClientParam } from "./models/client-param";
@@ -37,15 +37,9 @@ export class BugyoCloudClient {
     const config: AxiosRequestConfig = {
       headers: { "User-Agent": USER_AGENT },
       withCredentials: true,
+      jar: new CookieJar(),
     };
-    const instance = axios.create(config);
-
-    axiosCookieJarSupport(instance);
-
-    // via: https://www.npmjs.com/package/axios-cookiejar-support
-    // axios@>=0.19.0 cannot assign defaults.jar via axios.create()
-    // before wrapping instance. 
-    instance.defaults.jar = new CookieJar();
+    const instance = wrapper(axios.create(config));
 
     return instance;
   }
