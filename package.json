@@ -1,7 +1,7 @@
 {
   "name": "bugyo-cloud-client",
-  "version": "0.3.0",
-  "description": "Bugyo Cloud Client",
+  "version": "1.0.0",
+  "description": "HTTP client for Bugyo Cloud",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

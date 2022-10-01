@@ -3,6 +3,8 @@
 # Usage
 
 ```js
+const bcc = require('bugyo-cloud-client');
+
 // Implement LoggerFactory
 const loggerFactory = {
   getLogger(name) {
