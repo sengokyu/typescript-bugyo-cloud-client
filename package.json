@@ -22,6 +22,7 @@
   "author": "sengokyu",
   "license": "MIT",
   "devDependencies": {
+    "@tsconfig/node18": "^2.0.1",
     "@types/bunyan": "^1.8.8",
     "@types/jest": "^29.5.2",
     "@types/node": "^18.16.18",
@@ -39,7 +40,6 @@
     "axios": "^1.4.0",
     "axios-cookiejar-support": "^4.0.6",
     "cheerio": "^1.0.0-rc.12",
-    "eslit": "^6.0.0",
     "tough-cookie": "^4.1.3"
   }
 }
