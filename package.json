@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "presample": "tsc",
-    "sample": "samples/clock-in.js",
+    "sample": "samples/login-logout.js",
     "test": "jest",
     "prepublish": "tsc"
   },
