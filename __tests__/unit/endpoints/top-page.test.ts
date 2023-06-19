@@ -1,5 +1,5 @@
 import axios, { AxiosStatic } from "axios";
-import { ClientParam } from "../../../dist/models/client-param";
+import { ClientParam } from "../../../src/models/client-param";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { TopPage } from "../../../src/endpoints/top-page";
 import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
@@ -7,7 +7,7 @@ import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 // 何回もリクエストするため、jest-mock-axiosは使わず、自前でやる
 jest.mock("axios");
 
-const axiosMock = (axios as unknown) as jest.Mock<AxiosStatic>;
+const axiosMock = axios as unknown as jest.Mock<AxiosStatic>;
 
 describe("TopPage", () => {
   const loggerFactory = mockLoggerFactory();
@@ -29,7 +29,7 @@ describe("TopPage", () => {
     // Given
     const param = {} as ClientParam;
     const session = axios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = { param, session } as unknown as BugyoCloudClient;
     const url = "https://example.com/top";
     const responseUrl = "https://example.com/xxx/yyy/ddd";
     const instance = new TopPage(loggerFactory);
@@ -58,7 +58,7 @@ describe("TopPage", () => {
     // Given
     const param = {} as ClientParam;
     const session = axios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = { param, session } as unknown as BugyoCloudClient;
     const url1 = "https://example.com/1";
     const url2 = "https://example.com/2";
     const url3 = "https://example.com/3";
