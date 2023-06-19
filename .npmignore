@@ -6,4 +6,6 @@ __helpers__/
 scripts/
 tsconfig.json
 .eslintrc.json
-.node-version.github
+.node-version
+.github
+
