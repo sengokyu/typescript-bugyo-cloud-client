@@ -1,11 +1,10 @@
+**/.*
 jest.config.js
-src/
-__tests__/
-__mocks__/
-__helpers__/
-scripts/
 tsconfig.json
-.eslintrc.json
-.node-version
-.github
+node_modules/
+samples/
+src/
+__helpers__/
+__mocks__/
+__tests__/
 
