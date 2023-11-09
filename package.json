@@ -22,7 +22,7 @@
   "author": "sengokyu",
   "license": "MIT",
   "devDependencies": {
-    "@tsconfig/node18": "^2.0.1",
+    "@tsconfig/node20": "^20.1.2",
     "@types/bunyan": "^1.8.8",
     "@types/jest": "^29.5.2",
     "@types/node": "^18.16.18",
