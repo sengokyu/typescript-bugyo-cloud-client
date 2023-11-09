@@ -1,7 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { wrapper } from "axios-cookiejar-support";
+import axios, { AxiosInstance } from "axios";
+import { HttpCookieAgent, HttpsCookieAgent } from "http-cookie-agent/http";
 import { CookieJar } from "tough-cookie";
-import { USER_AGENT } from "./config";
 import { ClientParam } from "./models/client-param";
 import { BaseTask } from "./tasks/base/base-task";
 
@@ -34,14 +33,12 @@ export class BugyoCloudClient {
   }
 
   private createSession(): AxiosInstance {
-    const config: AxiosRequestConfig = {
-      headers: { "User-Agent": USER_AGENT },
-      withCredentials: true,
-      jar: new CookieJar(),
-    };
-    const instance = wrapper(axios.create(config));
+    const jar = new CookieJar();
 
-    return instance;
+    return axios.create({
+      httpAgent: new HttpCookieAgent({ cookies: { jar } }),
+      httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
+    });
   }
 }
 
