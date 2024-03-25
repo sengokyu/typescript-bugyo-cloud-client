@@ -3,13 +3,13 @@
 # Usage
 
 ```js
-const bcc = require('bugyo-cloud-client');
+const bcc = require("bugyo-cloud-client");
 
 // Implement LoggerFactory
 const loggerFactory = {
   getLogger(name) {
     // (snip)
-  }
+  },
 };
 // Settings
 const tenantCode = "Bugyo cloud tenant code";
@@ -124,14 +124,18 @@ npm run sample TenantCode LoginId Password
   - "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
   - "X-Requested-With" : "XMLHttpRequest"
   - "Referer" : 打刻画面の URL
-- Content:
-  - "ClockType" : 打刻種類
-  - "LaborSystemID" : "0"
-  - "LaborSystemCode" : ""
-  - "LaborSystemName" : ""
-  - "PositionLatitude" : 緯度
-  - "PositionLongitude" : 経度
-  - "PositionAccuracy" : "0"
+
+### form 内容
+
+| Form name           | Form value |
+| :------------------ | :--------- |
+| "ClockType"         | 打刻種類   |
+| "LaborSystemID"     | "0"        |
+| "LaborSystemCode"   | ""         |
+| "LaborSystemName"   | ""         |
+| "PositionLatitude"  | 緯度       |
+| "PositionLongitude" | 経度       |
+| "PositionAccuracy"  | "0"        |
 
 ### 打刻種類
 
@@ -142,3 +146,144 @@ npm run sample TenantCode LoginId Password
 
 - URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/calllogout/logout/?manuallogin=True
 - METHOD: GET
+
+## 申請
+
+- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/Workflow/Apply/
+- METHOD: POST
+- Headers:
+  - Content-Type: multipart/form-data
+
+### form-data 内容
+
+| Form data name                                | Form data value                   | Sample value                           |
+| :-------------------------------------------- | :-------------------------------- | :------------------------------------- |
+| "\_\_RequestVerificationToken"                | 入力画面にある input hidden value | （略）                                 |
+| "applyReasonRadios"                           | 事由ラジオボタンの値(?)           | "0"                                    |
+| "applyUnitRadios"                             | (?)                               | "0"                                    |
+| "js-application\_\_basicDate"                 | 開始日付                          | "2024/3/21 10:37:39"                   |
+| "js-application\_\_endDate"                   | 終了日付                          | "2024/3/22 10:37:39"                   |
+| "js-application\_\_startTime.TimeBoxDateType" | 開始時刻が n 日目か(?)            | "1"                                    |
+| "js-application\_\_startTime.Hour"            | 開始時刻（時間）                  | "18"                                   |
+| "js-application\_\_startTime.Minute"          | 開始時刻（分）                    | "00"                                   |
+| "TimeBoxInfo.IsBorder"                        | (?)                               | "value"                                |
+| "TimeBoxInfo.HourViewType"                    | (?)                               | "View_24hour"                          |
+| TimeBoxInfo.NavigationType"                   | (?)                               | "Separation"                           |
+| "js-application\_\_endTime.TimeBoxDateType"   | 終了時刻が n 日目か(?)            | "1"                                    |
+| "js-application\_\_endTime.Hour"              | 終了時刻（時間）                  | "22"                                   |
+| "js-application\_\_endTime.Minute"            | 終了時刻（分）                    | "00"                                   |
+| "TimeBoxInfo.IsBorder"                        | (?)                               | "value"                                |
+| "TimeBoxInfo.HourViewType"                    | (?)                               | "View_24hour"                          |
+| "TimeBoxInfo.NavigationType"                  | (?)                               | "Separation"                           |
+| "js-application\_\_punchMarkStartDate"        | (?)                               | "2024/3/21 0:0:0"                      |
+| "js-application\_\_startTimeWith.Hour"        | (?)                               | （空）                                 |
+| "js-application\_\_startTimeWith.Minute"      | (?)                               | （空）                                 |
+| "TimeBoxInfo.IsBorder"                        | (?)                               | "value"                                |
+| "TimeBoxInfo.HourViewType"                    | (?)                               | "Normal"                               |
+| "TimeBoxInfo.NavigationType"                  | (?)                               | "Separation"                           |
+| "js-application\_\_punchMarkEndDate"          | (?)                               | "2024/3/21 0:0:0"                      |
+| "js-application\_\_endTimeWith.Hour"          | (?)                               | （空）                                 |
+| "js-application\_\_endTimeWith.Minute"        | (?)                               | （空）                                 |
+| "TimeBoxInfo.IsBorder"                        | (?)                               | "value"                                |
+| "TimeBoxInfo.HourViewType"                    | (?)                               | "Normal"                               |
+| "TimeBoxInfo.NavigationType"                  | (?)                               | "Separation"                           |
+| "js-application\_\_startTimeFor.Hour"         | (?)                               | （空）                                 |
+| "js-application\_\_startTimeFor.Minute"       | (?)                               | （空）                                 |
+| "TimeBoxInfo.IsBorder"                        | (?)                               | "value"                                |
+| "TimeBoxInfo.HourViewType"                    | (?)                               | "Normal"                               |
+| "TimeBoxInfo.NavigationType"                  | (?)                               | "Separation"                           |
+| "js-application\_\_endTimeFor.Hour"           | (?)                               | （空）                                 |
+| "js-application\_\_endTimeFor.Minute"         | (?)                               | （空）                                 |
+| "TimeBoxInfo.IsBorder"                        | (?)                               | "value"                                |
+| "TimeBoxInfo.HourViewType"                    | (?)                               | "Normal"                               |
+| "TimeBoxInfo.NavigationType"                  | (?)                               | "Separation"                           |
+| "js-application\_\_calcSpanDate"              | (?)                               | ":"                                    |
+| "js-application\_\_calcSpanDateHour"          | (?)                               | "0"                                    |
+| "js-application\_\_calcSpanPeriod"            | 計算した経過時間                  | "4:00"                                 |
+| "js-application\_\_calcSpanPeriodHour"        | (?)                               | "0"                                    |
+| "attachedFile"                                | 添付ファイル(?)                   | Content-Type: application/octet-stream |
+| "Details[0].ReasonIndex"                      | 詳細 1: 事由ラジオボタンの値(?)   | "0"                                    |
+| "Details[0].ApplyUnit"                        | (?)                               | "0"                                    |
+| "Details[0].BasicDate"                        | 詳細 1: 日付                      | "2024/3/21"                            |
+| "Details[0].StartDate"                        | (?)                               | （空）                                 |
+| "Details[0].EndDate"                          | (?)                               | （空）                                 |
+| "Details[0].StartTime"                        | 詳細 1: 開始時刻                  | "18:00"                                |
+| "Details[0].EndTime"                          | 詳細 1: 終了時刻                  | "22:00"                                |
+| "Details[0].SpanDay"                          | (?)                               | （空）                                 |
+| "Details[0].ClockType"                        | (?)                               | （空）                                 |
+| "Details[0].MultiLaborTime"                   | (?)                               | （空）                                 |
+| "Details[0].PunchMarkTime"                    | (?)                               | （空）                                 |
+| "Details[0].CalcSpan"                         | 詳細 1: 計算した経過時間          | "4 時間 00 分"                         |
+| "Details[0].AttendanceHoliday1"               | (?)                               | （空）                                 |
+| "Details[0].AttendanceHoliday2"               | (?)                               | （空）                                 |
+| "Details[0].AttendanceHoliday3"               | (?)                               | （空）                                 |
+| "Details[0].AttendanceHoliday4"               | (?)                               | （空）                                 |
+| "Details[0].AttendanceHoliday5"               | (?)                               | （空）                                 |
+| "Details[0].ByteDoCompDay"                    | (?)                               | "0"                                    |
+| "Details[0].CompDayBasicDate"                 | (?)                               | （空）                                 |
+| "Details[0].CompDayStartDate"                 | (?)                               | （空）                                 |
+| "Details[0].CompDayStartTime"                 | (?)                               | （空）                                 |
+| "Details[0].CompDayEndDate"                   | (?)                               | （空）                                 |
+| "Details[0].CompDayEndTime"                   | (?)                               | （空）                                 |
+| "Details[0].CompDaySpanDay"                   | (?)                               | （空）                                 |
+| "Details[0].CompDayCalcSpan"                  | (?)                               | （空）                                 |
+| "Details[0].InitialApplylNo"                  | (?)                               | （空）                                 |
+| "Details[0].InitialApplyNo"                   | (?)                               | （空）                                 |
+| "CommuteRoute"                                | (?)                               | （空）                                 |
+| "Cause"                                       | 事由                              | "作業のため"                           |
+| "Address"                                     | (?)                               | （空）                                 |
+| "Memo"                                        | (?)                               | （空）                                 |
+| "AttachedFileCount"                           | 添付ファイル数(?)                 | "0"                                    |
+| "WorkflowName"                                | (?)                               | （空）                                 |
+| "WorkflowID"                                  | (?)                               | （空）                                 |
+| "ApplicationPositionCount"                    | (?)                               | （空）                                 |
+| "ApplicationPositionName"                     | (?)                               | （空）                                 |
+| "RestDaysNameList1"                           | (?)                               | （空）                                 |
+| "RestDaysNameList2"                           | (?)                               | （空）                                 |
+| "RestDaysNameList3"                           | (?)                               | （空）                                 |
+| "RestDaysNameList4"                           | (?)                               | （空）                                 |
+| "RestDaysNameList5"                           | (?)                               | （空）                                 |
+| "RestDaysNameList6"                           | (?)                               | （空）                                 |
+| "RestDaysNameList7"                           | (?)                               | （空）                                 |
+| "RestDaysNameList8"                           | (?)                               | （空）                                 |
+| "RestDaysNameList9"                           | (?)                               | （空）                                 |
+| "RestDaysNameList10"                          | (?)                               | （空）                                 |
+| "RestDaysNameList11"                          | (?)                               | （空）                                 |
+| "RestDaysNameList12"                          | (?)                               | （空）                                 |
+| "RestDaysList1"                               | (?)                               | （空）                                 |
+| "RestDaysList2"                               | (?)                               | （空）                                 |
+| "RestDaysList3"                               | (?)                               | （空）                                 |
+| "RestDaysList4"                               | (?)                               | （空）                                 |
+| "RestDaysList5"                               | (?)                               | （空）                                 |
+| "RestDaysList6"                               | (?)                               | （空）                                 |
+| "RestDaysList7"                               | (?)                               | （空）                                 |
+| "RestDaysList8"                               | (?)                               | （空）                                 |
+| "RestDaysList9"                               | (?)                               | （空）                                 |
+| "RestDaysList10"                              | (?)                               | （空）                                 |
+| "RestDaysList11"                              | (?)                               | （空）                                 |
+| "RestDaysList12"                              | (?)                               | （空）                                 |
+| "RestTimeList1"                               | (?)                               | （空）                                 |
+| "RestTimeList2"                               | (?)                               | （空）                                 |
+| "RestTimeList3"                               | (?)                               | （空）                                 |
+| "RestTimeList4"                               | (?)                               | （空）                                 |
+| "RestTimeList5"                               | (?)                               | （空）                                 |
+| "RestTimeList6"                               | (?)                               | （空）                                 |
+| "RestTimeList7"                               | (?)                               | （空）                                 |
+| "RestTimeList8"                               | (?)                               | （空）                                 |
+| "RestTimeList9"                               | (?)                               | （空）                                 |
+| "RestTimeList10"                              | (?)                               | （空）                                 |
+| "RestTimeList11"                              | (?)                               | （空）                                 |
+| "RestTimeList12"                              | (?)                               | （空）                                 |
+| "TotalOverTimeItemNameList1"                  | (?)                               | （空）                                 |
+| "TotalOverTimeItemNameList2"                  | (?)                               | （空）                                 |
+| "TotalOverTimeItemList1"                      | (?)                               | （空）                                 |
+| "TotalOverTimeItemList2"                      | (?)                               | （空）                                 |
+| "Val"                                         | (?)                               | "true"                                 |
+| "WorkerTaskModelList_Stamp"                   | (?)                               | （空）                                 |
+| "AppliedDivision"                             | (?)                               | "Overtime"                             |
+| "TaskID"                                      | (?)                               | "00000000-0000-0000-0000-000000000000" |
+| "Comment"                                     | (?)                               | （空）                                 |
+| "IsAlreadyIncorrectApplyChecked"              | (?)                               | "false"                                |
+| "ByIncorrectApply"                            | (?)                               | "False"                                |
+| "ByTemporarySavedApplicationForm"             | (?)                               | "False"                                |
+| "CtrlId"                                      | (?)                               | "--"                                   |
