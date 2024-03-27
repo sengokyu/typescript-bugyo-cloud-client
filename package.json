@@ -40,6 +40,7 @@
     "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
     "http-cookie-agent": "^6.0.1",
+    "temporal-polyfill": "^0.2.3",
     "tough-cookie": "^4.1.3"
   }
 }
