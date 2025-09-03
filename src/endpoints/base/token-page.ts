@@ -12,7 +12,7 @@ export abstract class TokenPage extends BaseEndpoint {
   protected abstract get EndpointName(): EndpointName;
 
   public async invoke(client: BugyoCloudClient): Promise<string> {
-    const url = produceUrl(this.EndpointName, client.param);
+    const url = produceUrl(this.EndpointName, client);
     const config: AxiosRequestConfig = {
       responseType: "text",
       maxRedirects: 0,

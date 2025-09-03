@@ -7,7 +7,7 @@ import { BaseEndpoint } from "./base/base-endpoint";
  */
 export class CallLogout extends BaseEndpoint {
   async invoke(client: BugyoCloudClient): Promise<void> {
-    const url = produceUrl("CallLogout", client.param);
+    const url = produceUrl("CallLogout", client);
 
     this.logger.debug("Trying to GET. url=%s", url);
 

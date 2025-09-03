@@ -14,7 +14,7 @@ export class TimeClock extends BaseEndpoint {
     token: string,
     punchInfo: PunchInfo
   ): Promise<void> {
-    const url = produceUrl("TimeClock", client.param);
+    const url = produceUrl("TimeClock", client);
     const config = this.createConfig(client, token);
     const data = this.createData(punchInfo);
 
@@ -47,7 +47,7 @@ export class TimeClock extends BaseEndpoint {
   }
 
   private getRefererUrl(client: BugyoCloudClient): string {
-    return produceUrl("PunchmarkPage", client.param);
+    return produceUrl("PunchmarkPage", client);
   }
 
   private createData(punchInfo: PunchInfo): string {

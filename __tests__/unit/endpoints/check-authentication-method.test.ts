@@ -1,9 +1,9 @@
 import mockAxios from "jest-mock-axios";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CheckAuthenticationMethod } from "../../../src/endpoints/check-authentication-method";
 import { AuthInfo } from "../../../src/models/auth-info";
 import { ClientParam } from "../../../src/models/client-param";
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("CheckAuthenticationMethod", () => {
   const loggerFactory = mockLoggerFactory();
@@ -11,9 +11,9 @@ describe("CheckAuthenticationMethod", () => {
   it("LOGIN IDをPOSTします", async () => {
     // Given
     const tenantCode = "ttt";
-    const param: ClientParam = { tenantCode };
+    const param: ClientParam = { tenantCode, userCode: null };
     const session = mockAxios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = { param, session } as unknown as BugyoCloudClient;
     const token = "my token";
     const loginId = "log in";
     const password = "pa ss";
@@ -47,9 +47,9 @@ describe("CheckAuthenticationMethod", () => {
   it("リダレクトの時は例外発生します", async () => {
     // Given
     const tenantCode = "ttt";
-    const param: ClientParam = { tenantCode };
+    const param: ClientParam = { tenantCode, userCode: null };
     const session = mockAxios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = { param, session } as unknown as BugyoCloudClient;
     const token = "my token";
     const loginId = "log in";
     const password = "pa ss";

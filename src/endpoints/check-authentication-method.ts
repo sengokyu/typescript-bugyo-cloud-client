@@ -17,7 +17,7 @@ export class CheckAuthenticationMethod extends BaseEndpoint {
     token: string,
     authInfo: AuthInfo
   ): Promise<void> {
-    const url = produceUrl("CheckAuthenticationMethod", client.param);
+    const url = produceUrl("CheckAuthenticationMethod", client);
     const data = this.createData(authInfo);
     const config = this.createConfig(token);
 

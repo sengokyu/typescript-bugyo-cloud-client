@@ -1,9 +1,9 @@
 import mockAxios from "jest-mock-axios";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { Authenticate } from "../../../src/endpoints/authenticate";
 import { AuthInfo } from "../../../src/models/auth-info";
 import { ClientParam } from "../../../src/models/client-param";
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("Authenticate", () => {
   const loggerFactory = mockLoggerFactory();
@@ -17,13 +17,12 @@ describe("Authenticate", () => {
     const tenantCode = "ttt";
     const param: ClientParam = { tenantCode };
     const session = mockAxios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = { param, session } as unknown as BugyoCloudClient;
     const token = "my token";
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
     const instance = new Authenticate(loggerFactory);
-    const url = "hoge hoge";
 
     // When
     const actualPromise = instance.invoke(client, token, authInfo);
@@ -40,7 +39,7 @@ describe("Authenticate", () => {
       "X-Requested-With=XMLHttpRequest",
     ].join("&");
     expect(mockAxios.post).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}/login/login/?Length=5`,
+      `https://id.obc.jp/${tenantCode}/login/login/`,
       expectedData,
       {
         headers: {
@@ -50,10 +49,9 @@ describe("Authenticate", () => {
     );
 
     // When
-    mockAxios.mockResponse({ data: { RedirectURL: url } });
-    const actual = await actualPromise;
+    mockAxios.mockResponse();
 
     // Then
-    expect(actual).toBe(url);
+    expect(actualPromise).resolves.toBeUndefined();
   });
 });

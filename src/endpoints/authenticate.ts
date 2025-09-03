@@ -1,6 +1,6 @@
-import { AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosRequestConfig } from "axios";
 import qs from "querystring";
-import { BugyoCloudClient, BugyoCloudClientError } from "../bugyo-cloud-client";
+import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { AuthInfo } from "../models/auth-info";
 import { produceUrl } from "../utils/url-utils";
 import { BaseEndpoint } from "./base/base-endpoint";
@@ -17,8 +17,8 @@ export class Authenticate extends BaseEndpoint {
     client: BugyoCloudClient,
     token: string,
     authInfo: AuthInfo
-  ): Promise<string> {
-    const url = produceUrl("Authenticate", client.param);
+  ): Promise<void> {
+    const url = produceUrl("Authenticate", client);
     const data = this.createData(token, authInfo);
     const config: AxiosRequestConfig = {
       headers: {
@@ -33,8 +33,6 @@ export class Authenticate extends BaseEndpoint {
     this.throwIfNgStatus(resp);
 
     this.logger.info("Authenticate succeed.");
-
-    return this.parseResponse(resp);
   }
 
   private createData(token: string, authInfo: AuthInfo): string {
@@ -48,16 +46,5 @@ export class Authenticate extends BaseEndpoint {
       __RequestVerificationToken: token,
       "X-Requested-With": "XMLHttpRequest",
     });
-  }
-
-  private parseResponse(resp: AxiosResponse): string {
-    if ("RedirectURL" in resp.data) {
-      return resp.data["RedirectURL"];
-    } else {
-      const content = resp.data;
-
-      this.logger.error("Response is not to be expected.", content);
-      throw new BugyoCloudClientError("Response is not to be expected.");
-    }
   }
 }

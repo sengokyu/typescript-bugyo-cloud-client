@@ -2,9 +2,10 @@ import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { Authenticate } from "../endpoints/authenticate";
 import { CheckAuthenticationMethod } from "../endpoints/check-authentication-method";
 import { LoginPage } from "../endpoints/login-page";
-import { TopPage } from "../endpoints/top-page";
+import { OmRedirect } from "../endpoints/om-redirect";
 import { AuthInfo } from "../models/auth-info";
 import { Logger, LoggerFactory } from "../utils/logger-factory";
+import { extractUserCode } from "../utils/url-utils";
 import { BaseTask } from "./base/base-task";
 
 /**
@@ -21,50 +22,25 @@ export class LoginTask implements BaseTask {
   }
 
   async execute(client: BugyoCloudClient): Promise<void> {
+    const loginPage = new LoginPage(this.loggerFactory);
+    const checkAuthenticationMethod = new CheckAuthenticationMethod(
+      this.loggerFactory
+    );
+    const authenticate = new Authenticate(this.loggerFactory);
+    const omRedirect = new OmRedirect(this.loggerFactory);
+
     this.logger.trace("Trying to get the login page token.");
-    const token = await this.getLoginPageToken(client);
-    await this.checkAuthMethod(client, token);
+    const token = await loginPage.invoke(client);
+
+    this.logger.trace("Trying to check authentication method.");
+    await checkAuthenticationMethod.invoke(client, token, this.authInfo);
+
+    this.logger.trace("Trying to authenticate.");
+    await authenticate.invoke(client, token, this.authInfo);
 
     this.logger.trace("Trying to get the redirect url.");
-    const url = await this.authenticate(client, token);
-    await this.setupUserCode(client, url);
-  }
+    const url = await omRedirect.invoke(client);
 
-  private getLoginPageToken(client: BugyoCloudClient): Promise<string> {
-    return new LoginPage(this.loggerFactory).invoke(client);
-  }
-
-  private checkAuthMethod(
-    client: BugyoCloudClient,
-    token: string
-  ): Promise<void> {
-    return new CheckAuthenticationMethod(this.loggerFactory).invoke(
-      client,
-      token,
-      this.authInfo
-    );
-  }
-
-  private authenticate(
-    client: BugyoCloudClient,
-    token: string
-  ): Promise<string> {
-    return new Authenticate(this.loggerFactory).invoke(
-      client,
-      token,
-      this.authInfo
-    );
-  }
-
-  private async setupUserCode(
-    client: BugyoCloudClient,
-    url: string
-  ): Promise<void> {
-    const topPage = new TopPage(this.loggerFactory);
-    const userCode = await topPage.invoke(client, url);
-
-    this.logger.debug("UserCode retrieved.", userCode);
-
-    client.param.userCode = userCode;
+    client.userCode = extractUserCode(url);
   }
 }

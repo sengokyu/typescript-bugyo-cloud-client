@@ -1,26 +1,33 @@
-import axios, { AxiosInstance } from "axios";
-import { HttpCookieAgent, HttpsCookieAgent } from "http-cookie-agent/http";
-import { CookieJar } from "tough-cookie";
 import { ClientParam } from "./models/client-param";
 import { BaseTask } from "./tasks/base/base-task";
+import { HttpSession } from "./utils/http-session";
 
-export class BugyoCloudClient {
-  private readonly _param: ClientParam;
-  private readonly _session: AxiosInstance;
+export class BugyoCloudClient implements ClientParam {
+  private readonly _tenantCode: string;
+  private readonly _session: HttpSession;
+  private _userCode: string | null = null;
 
   /**
    *
    */
   constructor(tenantCode: string) {
-    this._param = { tenantCode };
-    this._session = this.createSession();
+    this._tenantCode = tenantCode;
+    this._session = new HttpSession();
   }
 
-  get param(): ClientParam {
-    return this._param;
+  get tenantCode(): string {
+    return this._tenantCode;
   }
 
-  get session(): AxiosInstance {
+  get userCode(): string | null {
+    return this._userCode;
+  }
+
+  set userCode(value: string) {
+    this._userCode = value;
+  }
+
+  get session(): HttpSession {
     return this._session;
   }
 
@@ -30,15 +37,6 @@ export class BugyoCloudClient {
    */
   public doA(task: BaseTask): Promise<void> {
     return task.execute(this);
-  }
-
-  private createSession(): AxiosInstance {
-    const jar = new CookieJar();
-
-    return axios.create({
-      httpAgent: new HttpCookieAgent({ cookies: { jar } }),
-      httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
-    });
   }
 }
 

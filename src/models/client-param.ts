@@ -1,4 +1,4 @@
 export interface ClientParam {
-  tenantCode: string;
-  userCode?: string;
+  get tenantCode(): string;
+  get userCode(): string | null;
 }
