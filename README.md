@@ -46,6 +46,8 @@ npm run sample TenantCode LoginId Password
 
 # 画面あるいは API
 
+**2025-9-1 更新**
+
 ## 認証画面
 
 - URL: https://id.obc.jp/{{テナント?}}/
@@ -66,16 +68,18 @@ npm run sample TenantCode LoginId Password
   - "OBCiD" : ログイン ID
   - "isBugyoCloud" : "false"
 - Response:
+  - Status: 200
   - Headers:
     - Content-Type: application/json; charset=utf-8
   - Content:
-    - AuthenticationMethod
-    - SAMLButtonText
-    - PasswordButtonText
+    - AuthenticationMethod: number
+    - SAMLButtonText: string
+    - PasswordButtonText: string
+    - SSOMethod: number
 
 ## 認証
 
-- URL: https://id.obc.jp/{{テナント?}}/login/login/?Length=5
+- URL: https://id.obc.jp/{{テナント?}}/login/login/
 - METHOD: POST
 - Headers:
   - Content-Type: application/x-www-form-urlencoded; charset=UTF-8
@@ -89,14 +93,38 @@ npm run sample TenantCode LoginId Password
   - "\_\_RequestVerificationToken" : 認証画面のフォームにある input hidden value
   - "X-Requested-With" : "XMLHttpRequest"
 - Response:
+  - Status: 200
   - Headers:
     - Content-Type: application/json; charset=utf-8
-  - Content:
-    - RedirectURL
-    - LoginOBCiD
+  - Content: 空
 
-レスポンスにある RedirectURL を GET すると 302 が返ります。
-302 に従うと、ユーザ初期画面へ遷移します。URL は、https://hromssp.obc.jp/{{テナント？}}/{{ユニーク文字列？}}/ のようになります。
+**2025-9-1 以前は、ここでリダイレクト先 URL を取得できました。**
+
+## ワンタイムトークン URL 取得
+
+- URL: https://id.obc.jp/{{テナント?}}/omredirect/redirect/
+- METHOD: GET
+- Headers:
+  - Referer: https://id.obc.jp/{{テナント?}}/
+- Response:
+  - Status: 302
+  - Headers
+    - Location: ワンタイムトークン URL
+
+リダイレクト先 URL にはワンタイムトークンが含まれています。
+
+## リダイレクト先 URL 取得
+
+- URL: (先に取得したワンタイムトークン URL)
+- METHOD: GET
+- Headers:
+  - Referer: https://id.obc.jp/{{テナント?}}/
+- Response:
+  - Status: 302
+  - Headers:
+    - Location: リダイレクト先 URL
+
+302 に従うとユーザ初期画面へ遷移します。URL は、https://hromssp.obc.jp/{{テナント？}}/{{ユニーク文字列？}}/ のようになります。
 
 ## ユーザ初期画面
 
