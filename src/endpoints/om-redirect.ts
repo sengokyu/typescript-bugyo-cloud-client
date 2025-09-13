@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { BugyoCloudClient } from "../bugyo-cloud-client";
+import { BugyoCloudClient, BugyoCloudClientError } from "../bugyo-cloud-client";
 import { produceUrl } from "../utils/url-utils";
 import { BaseEndpoint } from "./base/base-endpoint";
 
@@ -23,9 +23,13 @@ export class OmRedirect extends BaseEndpoint {
 
     this.logger.debug("Trying to GET, url=%s", url);
 
-    const resp = await client.session.get(url, config);
+    const resp = await client.session.getAndFollow(url, config);
 
     this.throwIfNgStatus(resp);
+
+    if (!resp.config.url) {
+      throw new BugyoCloudClientError("Cannot retrieve the top page URL.");
+    }
 
     return resp.config.url!;
   }
