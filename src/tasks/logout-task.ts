@@ -1,5 +1,5 @@
 import { BugyoCloudClient } from "..";
-import { CallLogout } from "../endpoints/calll-logout";
+import { CallLogout } from "../endpoints/call-logout";
 import { Logger, LoggerFactory } from "../utils/logger-factory";
 import { BaseTask } from "./base/base-task";
 
@@ -13,9 +13,9 @@ export class LogoutTask implements BaseTask {
     this.logger = loggerFactory.getLogger(LogoutTask.name);
   }
 
-  execute(client: BugyoCloudClient): Promise<void> {
+  async execute(client: BugyoCloudClient): Promise<void> {
     this.logger.debug("Trying to logout from BUGYO CLOUD.");
 
-    return new CallLogout(this.loggerFactory).invoke(client);
+    await new CallLogout(this.loggerFactory).invoke(client);
   }
 }
