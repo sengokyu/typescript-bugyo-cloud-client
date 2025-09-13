@@ -1,22 +1,18 @@
-import mockAxios from "jest-mock-axios";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { LoginPage } from "../../../src/endpoints/login-page";
-import { ClientParam } from "../../../src/models/client-param";
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("LoginPage", () => {
   const loggerFactory = mockLoggerFactory();
 
   afterEach(() => {
-    mockAxios.reset();
+    jest.clearAllMocks();
   });
 
   it("トークンを返します", async () => {
     // Given
     const tenantCode = "ttt";
-    const param: ClientParam = { tenantCode };
-    const session = mockAxios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = { tenantCode, session: { get: jest.fn() } };
     const instance = new LoginPage(loggerFactory);
     const data = `
     <form action="http://example.com/">
@@ -24,23 +20,22 @@ describe("LoginPage", () => {
     </form>
     `;
 
+    client.session.get.mockResolvedValue({ status: 200, data });
+
     // When
-    const actualPromise = instance.invoke(client);
+    const actualPromise = instance.invoke(
+      client as unknown as BugyoCloudClient
+    );
 
     // Then
-    expect(mockAxios.get).toHaveBeenCalledWith(
+    await expect(actualPromise).resolves.toBe("my token");
+
+    expect(client.session.get).toHaveBeenCalledWith(
       `https://id.obc.jp/${tenantCode}`,
       {
         responseType: "text",
         maxRedirects: 0,
       }
     );
-
-    // When
-    mockAxios.mockResponse({ data });
-    const actual = await actualPromise;
-
-    // Then
-    expect(actual).toBe("my token");
   });
 });

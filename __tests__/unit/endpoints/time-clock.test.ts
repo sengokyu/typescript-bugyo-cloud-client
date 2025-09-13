@@ -1,34 +1,42 @@
-import mockAxios from "jest-mock-axios";
+import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { TimeClock } from "../../../src/endpoints/time-clock";
-import { ClientParam } from "../../../src/models/client-param";
 import { PunchInfo } from "../../../src/models/punch-info";
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 
 describe("TimeClock", () => {
   const loggerFactory = mockLoggerFactory();
 
   afterEach(() => {
-    mockAxios.reset();
+    jest.clearAllMocks();
   });
 
   it("打刻情報POSTします", async () => {
     // Given
     const tenantCode = "ttt";
     const userCode = "uuu;";
-    const param: ClientParam = { tenantCode, userCode };
-    const session = mockAxios;
-    const client = ({ param, session } as unknown) as BugyoCloudClient;
+    const client = {
+      tenantCode,
+      userCode,
+      session: { post: jest.fn() },
+    };
     const token = "my token";
     const punchInfo: PunchInfo = {
       clockType: "ClockIn",
     };
     const instance = new TimeClock(loggerFactory);
 
+    client.session.post.mockResolvedValue({ status: 200, data: "" });
+
     // When
-    const actualPromise = instance.invoke(client, token, punchInfo);
+    const actualPromise = instance.invoke(
+      client as unknown as BugyoCloudClient,
+      token,
+      punchInfo
+    );
 
     // Then
+    await expect(actualPromise).resolves.toBeUndefined();
+
     const expectedUrl = `https://hromssp.obc.jp/${tenantCode}/${userCode}/TimeClock/InsertReadDateTime/`;
     const expectedData = [
       "ClockType=ClockIn",
@@ -45,13 +53,13 @@ describe("TimeClock", () => {
       "X-Requested-With": "XMLHttpRequest",
       Referer: `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`,
     };
-    expect(mockAxios.post).toHaveBeenCalledWith(expectedUrl, expectedData, {
-      headers: expectedHeaders,
-      maxRedirects: 0,
-    });
-
-    // When
-    mockAxios.mockResponse({ status: 200, data: "" });
-    await actualPromise;
+    expect(client.session.post).toHaveBeenCalledWith(
+      expectedUrl,
+      expectedData,
+      {
+        headers: expectedHeaders,
+        maxRedirects: 0,
+      }
+    );
   });
 });

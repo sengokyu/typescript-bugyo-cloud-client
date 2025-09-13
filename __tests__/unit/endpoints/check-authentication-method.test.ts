@@ -1,30 +1,41 @@
-import mockAxios from "jest-mock-axios";
 import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CheckAuthenticationMethod } from "../../../src/endpoints/check-authentication-method";
 import { AuthInfo } from "../../../src/models/auth-info";
-import { ClientParam } from "../../../src/models/client-param";
+import { HttpSession } from "../../../src/utils/http-session";
 
 describe("CheckAuthenticationMethod", () => {
   const loggerFactory = mockLoggerFactory();
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("LOGIN IDをPOSTします", async () => {
     // Given
     const tenantCode = "ttt";
-    const param: ClientParam = { tenantCode, userCode: null };
-    const session = mockAxios;
-    const client = { param, session } as unknown as BugyoCloudClient;
+    const client = {
+      tenantCode,
+      session: { post: jest.fn() },
+    };
     const token = "my token";
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
     const instance = new CheckAuthenticationMethod(loggerFactory);
 
+    client.session.post.mockResolvedValue({ status: 200, data: "" });
+
     // When
-    const actualPromise = instance.invoke(client, token, authInfo);
+    const actualPromise = instance.invoke(
+      client as unknown as BugyoCloudClient,
+      token,
+      authInfo
+    );
 
     // Then
-    expect(mockAxios.post).toHaveBeenCalledWith(
+    await expect(actualPromise).resolves.toBeUndefined();
+    expect(client.session.post).toHaveBeenCalledWith(
       `https://id.obc.jp/${tenantCode}/login/CheckAuthenticationMethod`,
       {
         OBCiD: loginId,
@@ -38,34 +49,5 @@ describe("CheckAuthenticationMethod", () => {
         maxRedirects: 0,
       }
     );
-
-    // When
-    mockAxios.mockResponse({ data: "" });
-    await actualPromise;
-  });
-
-  it("リダレクトの時は例外発生します", async () => {
-    // Given
-    const tenantCode = "ttt";
-    const param: ClientParam = { tenantCode, userCode: null };
-    const session = mockAxios;
-    const client = { param, session } as unknown as BugyoCloudClient;
-    const token = "my token";
-    const loginId = "log in";
-    const password = "pa ss";
-    const authInfo: AuthInfo = { loginId, password };
-    const instance = new CheckAuthenticationMethod(loggerFactory);
-
-    // When
-    const actualPromise = instance.invoke(client, token, authInfo);
-
-    // THen
-    expect(mockAxios.post).toHaveBeenCalled();
-
-    // When
-    mockAxios.mockResponse({ status: 301, data: "" });
-
-    // Then
-    await expect(actualPromise).rejects.toThrow();
   });
 });

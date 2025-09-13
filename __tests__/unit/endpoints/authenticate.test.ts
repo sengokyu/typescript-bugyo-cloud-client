@@ -1,23 +1,19 @@
-import mockAxios from "jest-mock-axios";
 import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { Authenticate } from "../../../src/endpoints/authenticate";
 import { AuthInfo } from "../../../src/models/auth-info";
-import { ClientParam } from "../../../src/models/client-param";
 
 describe("Authenticate", () => {
   const loggerFactory = mockLoggerFactory();
 
-  afterEach(() => {
-    mockAxios.reset();
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   it("認証情報をPOSTします", async () => {
     // Given
     const tenantCode = "ttt";
-    const param: ClientParam = { tenantCode };
-    const session = mockAxios;
-    const client = { param, session } as unknown as BugyoCloudClient;
+    const client = { tenantCode, session: { post: jest.fn() } };
     const token = "my token";
     const loginId = "log in";
     const password = "pa ss";
@@ -25,9 +21,16 @@ describe("Authenticate", () => {
     const instance = new Authenticate(loggerFactory);
 
     // When
-    const actualPromise = instance.invoke(client, token, authInfo);
+    client.session.post.mockResolvedValue({ status: 200 });
+    const actualPromise = instance.invoke(
+      client as unknown as BugyoCloudClient,
+      token,
+      authInfo
+    );
 
     // Then
+    await expect(actualPromise).resolves.toBeUndefined();
+
     const expectedData = [
       "btnLogin=",
       "OBCID=log%20in",
@@ -38,7 +41,7 @@ describe("Authenticate", () => {
       "__RequestVerificationToken=my%20token",
       "X-Requested-With=XMLHttpRequest",
     ].join("&");
-    expect(mockAxios.post).toHaveBeenCalledWith(
+    expect(client.session.post).toHaveBeenCalledWith(
       `https://id.obc.jp/${tenantCode}/login/login/`,
       expectedData,
       {
@@ -47,11 +50,5 @@ describe("Authenticate", () => {
         },
       }
     );
-
-    // When
-    mockAxios.mockResponse();
-
-    // Then
-    expect(actualPromise).resolves.toBeUndefined();
   });
 });

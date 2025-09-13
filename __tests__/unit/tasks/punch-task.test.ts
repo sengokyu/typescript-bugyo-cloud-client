@@ -1,13 +1,12 @@
-import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
-import { PunchmarkPage } from "../../../src/endpoints/punchmark-page";
-import { TimeClock } from "../../../src/endpoints/time-clock";
-import { ClientParam } from "../../../src/models/client-param";
-import { PunchInfo } from "../../../src/models/punch-info";
-import { PunchTask } from "../../../src/tasks/punch-task";
 import {
   mockEndpointImplementation,
   mockLoggerFactory,
 } from "../../../__helpers__/mock-helper";
+import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
+import { PunchmarkPage } from "../../../src/endpoints/punchmark-page";
+import { TimeClock } from "../../../src/endpoints/time-clock";
+import { PunchInfo } from "../../../src/models/punch-info";
+import { PunchTask } from "../../../src/tasks/punch-task";
 
 jest.mock("../../../src/endpoints/punchmark-page");
 jest.mock("../../../src/endpoints/time-clock");
@@ -39,8 +38,7 @@ describe("PunchTask", () => {
     // Given
     const tenantCode = "ttttt";
     const userCode = "uuuuu";
-    const param: ClientParam = { tenantCode, userCode };
-    const client = { param } as BugyoCloudClient;
+    const client = { tenantCode, userCode } as BugyoCloudClient;
     const punchmarkPageInvoke = mockEndpointImplementation(PunchmarkPageMock);
     const timeClockInvoke = mockEndpointImplementation(TimeClockMock);
     const token = "my token";
