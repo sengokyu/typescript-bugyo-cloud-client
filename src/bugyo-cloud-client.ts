@@ -10,9 +10,9 @@ export class BugyoCloudClient implements ClientParam {
   /**
    *
    */
-  constructor(tenantCode: string) {
+  constructor(tenantCode: string, session: HttpSession) {
     this._tenantCode = tenantCode;
-    this._session = new HttpSession();
+    this._session = session;
   }
 
   get tenantCode(): string {
