@@ -24,7 +24,7 @@ export class TimeClock extends BaseEndpoint {
 
     this.throwIfNgStatus(resp);
 
-    this.logger.info('TimeClock succeed.')
+    this.logger.info("TimeClock succeed.");
   }
 
   private createConfig(
