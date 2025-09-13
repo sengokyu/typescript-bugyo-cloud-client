@@ -1,4 +1,4 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { BASE_URL } from "../../../src/config";
 import { TopPage } from "../../../src/endpoints/top-page";
@@ -7,8 +7,6 @@ import { extractUserCode } from "../../../src/utils/url-utils";
 jest.mock("../../../src/utils/url-utils");
 
 describe("TopPage", () => {
-  const loggerFactory = mockLoggerFactory();
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -16,7 +14,7 @@ describe("TopPage", () => {
   it("create instance", () => {
     // Given
     // When
-    const actual = new TopPage(loggerFactory);
+    const actual = new TopPage(mockLogger());
 
     // Then
     expect(actual).toBeInstanceOf(TopPage);
@@ -28,7 +26,7 @@ describe("TopPage", () => {
     const url = "https://example.com/top";
     const responseUrl = "https://example.com/xxx/yyy/ddd";
     const userCode = "yyy";
-    const instance = new TopPage(loggerFactory);
+    const instance = new TopPage(mockLogger());
 
     client.session.getAndFollow.mockResolvedValue({
       status: 200,

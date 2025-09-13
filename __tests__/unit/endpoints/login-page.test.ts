@@ -1,10 +1,8 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { LoginPage } from "../../../src/endpoints/login-page";
 
 describe("LoginPage", () => {
-  const loggerFactory = mockLoggerFactory();
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -13,7 +11,7 @@ describe("LoginPage", () => {
     // Given
     const tenantCode = "ttt";
     const client = { tenantCode, session: { get: jest.fn() } };
-    const instance = new LoginPage(loggerFactory);
+    const instance = new LoginPage(mockLogger());
     const data = `
     <form action="http://example.com/">
     <input name="__RequestVerificationToken" value="my token">

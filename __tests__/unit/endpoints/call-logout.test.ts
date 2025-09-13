@@ -1,4 +1,4 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CallLogout } from "../../../src/endpoints/call-logout";
 import { produceUrl } from "../../../src/utils/url-utils";
@@ -6,12 +6,10 @@ import { produceUrl } from "../../../src/utils/url-utils";
 jest.mock("../../../src/utils/url-utils");
 
 describe("Logout", () => {
-  const loggerFactory = mockLoggerFactory();
-
   it("create instance", () => {
     // Given
     // When
-    const actual = new CallLogout(loggerFactory);
+    const actual = new CallLogout(mockLogger());
 
     // Then
     expect(actual).toBeInstanceOf(CallLogout);
@@ -21,7 +19,7 @@ describe("Logout", () => {
     // Given
     const url = "https://test.example.com";
     const client = { session: { get: jest.fn() } };
-    const instance = new CallLogout(loggerFactory);
+    const instance = new CallLogout(mockLogger());
 
     client.session.get.mockResolvedValue({ status: 200 });
     (produceUrl as jest.Mock).mockReturnValue(url);

@@ -1,17 +1,15 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { OmRedirect } from "../../../src/endpoints/om-redirect";
 
 describe("OmRedirect", () => {
-  const loggerFactory = mockLoggerFactory();
-
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it("トップのURLを返す", async () => {
     // Given
-    const instance = new OmRedirect(loggerFactory);
+    const instance = new OmRedirect(mockLogger());
     const tenantCode = "ttttttt";
     const client = { tenantCode, session: { getAndFollow: jest.fn() } };
     const url = "https://example.com/xxx/yyy/ddd";

@@ -1,12 +1,9 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CheckAuthenticationMethod } from "../../../src/endpoints/check-authentication-method";
 import { AuthInfo } from "../../../src/models/auth-info";
-import { HttpSession } from "../../../src/utils/http-session";
 
 describe("CheckAuthenticationMethod", () => {
-  const loggerFactory = mockLoggerFactory();
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -22,7 +19,7 @@ describe("CheckAuthenticationMethod", () => {
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
-    const instance = new CheckAuthenticationMethod(loggerFactory);
+    const instance = new CheckAuthenticationMethod(mockLogger());
 
     client.session.post.mockResolvedValue({ status: 200, data: "" });
 

@@ -1,11 +1,9 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { Authenticate } from "../../../src/endpoints/authenticate";
 import { AuthInfo } from "../../../src/models/auth-info";
 
 describe("Authenticate", () => {
-  const loggerFactory = mockLoggerFactory();
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -18,7 +16,7 @@ describe("Authenticate", () => {
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
-    const instance = new Authenticate(loggerFactory);
+    const instance = new Authenticate(mockLogger());
 
     // When
     client.session.post.mockResolvedValue({ status: 200 });

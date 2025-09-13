@@ -1,8 +1,8 @@
 import {
   mockEndpointImplementation,
-  mockLoggerFactory,
+  mockLogger,
 } from "../../../__helpers__/mock-helper";
-import { BugyoCloudClient } from "../../../src";
+import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CallLogout } from "../../../src/endpoints/call-logout";
 import { LogoutTask } from "../../../src/tasks/logout-task";
 
@@ -11,8 +11,6 @@ jest.mock("../../../src/endpoints/call-logout");
 const mockedCallLogout = CallLogout as jest.Mock<CallLogout>;
 
 describe("LogoutTask", () => {
-  const loggerFactory = mockLoggerFactory();
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -20,7 +18,10 @@ describe("LogoutTask", () => {
   it("create instance", () => {
     // Given
     // When
-    const actual = new LogoutTask(loggerFactory);
+    const actual = new LogoutTask(
+      mockLogger(),
+      mockEndpointImplementation<CallLogout>()
+    );
 
     // Then
     expect(actual).toBeInstanceOf(LogoutTask);
@@ -29,10 +30,10 @@ describe("LogoutTask", () => {
   it("CallLogoutを呼びます", async () => {
     // Given
     const client = {} as unknown as BugyoCloudClient;
-    const callLogoutInvoke = mockEndpointImplementation(mockedCallLogout);
-    const instance = new LogoutTask(loggerFactory);
+    const callLogout = mockEndpointImplementation<CallLogout>();
+    const instance = new LogoutTask(mockLogger(), callLogout);
 
-    callLogoutInvoke.mockResolvedValue(undefined);
+    callLogout.invoke.mockResolvedValue(undefined);
 
     // when
     const actualPromise = instance.execute(client);
@@ -40,9 +41,7 @@ describe("LogoutTask", () => {
     // Then
     await expect(actualPromise).resolves.toBeUndefined();
 
-    // コンストラクタ呼び出し
-    expect(mockedCallLogout).toHaveBeenCalled();
     // メソッド呼び出し
-    expect(callLogoutInvoke).toHaveBeenCalledWith(client);
+    expect(callLogout.invoke).toHaveBeenCalledWith(client);
   });
 });

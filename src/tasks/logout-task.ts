@@ -1,21 +1,20 @@
-import { BugyoCloudClient } from "..";
+import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { CallLogout } from "../endpoints/call-logout";
-import { Logger, LoggerFactory } from "../utils/logger-factory";
+import { Logger } from "../utils/logger-factory";
 import { BaseTask } from "./base/base-task";
 
 /**
  * ログアウトします。
  */
 export class LogoutTask implements BaseTask {
-  private readonly logger: Logger;
-
-  constructor(private loggerFactory: LoggerFactory) {
-    this.logger = loggerFactory.getLogger(LogoutTask.name);
-  }
+  constructor(
+    private readonly logger: Logger,
+    private readonly callLogout: CallLogout
+  ) {}
 
   async execute(client: BugyoCloudClient): Promise<void> {
     this.logger.debug("Trying to logout from BUGYO CLOUD.");
 
-    await new CallLogout(this.loggerFactory).invoke(client);
+    await this.callLogout.invoke(client);
   }
 }

@@ -1,10 +1,8 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { PunchmarkPage } from "../../../src/endpoints/punchmark-page";
 
 describe("PunchmarkPage", () => {
-  const loggerFactory = mockLoggerFactory();
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -18,7 +16,7 @@ describe("PunchmarkPage", () => {
       userCode,
       session: { get: jest.fn() },
     };
-    const instance = new PunchmarkPage(loggerFactory);
+    const instance = new PunchmarkPage(mockLogger());
     const data = `
     <form action="http://example.com/">
     <input name="__RequestVerificationToken" value="my token">

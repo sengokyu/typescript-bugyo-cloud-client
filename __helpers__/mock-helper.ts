@@ -1,23 +1,19 @@
+import { BaseEndpoint } from "../src/endpoints/base/base-endpoint";
 import { Logger, LoggerFactory } from "../src/utils/logger-factory";
 /**
  * Endpointの実装をモックに差し替えます
- * @param target Endpointのモック
  */
-export const mockEndpointImplementation = (target: jest.Mock) => {
-  const invoke = jest.fn();
+export function mockEndpointImplementation<
+  T extends BaseEndpoint
+>(): jest.Mocked<T> {
+  return { invoke: jest.fn() } as unknown as jest.Mocked<T>;
+}
 
-  target.mockImplementation(() => ({ invoke }));
-
-  return invoke;
-};
-
-export const mockLoggerFactory = (): LoggerFactory => {
-  const getLogger = jest.fn<Logger, []>(() => ({
+export function mockLogger(): Logger {
+  return {
     trace: jest.fn(),
     debug: jest.fn(),
     info: jest.fn(),
     error: jest.fn(),
-  }));
-  const mock = jest.fn<LoggerFactory, []>(() => ({ getLogger }));
-  return new mock();
-};
+  };
+}

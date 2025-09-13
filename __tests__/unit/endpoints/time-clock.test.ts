@@ -1,11 +1,9 @@
-import { mockLoggerFactory } from "../../../__helpers__/mock-helper";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { TimeClock } from "../../../src/endpoints/time-clock";
 import { PunchInfo } from "../../../src/models/punch-info";
 
 describe("TimeClock", () => {
-  const loggerFactory = mockLoggerFactory();
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -23,7 +21,7 @@ describe("TimeClock", () => {
     const punchInfo: PunchInfo = {
       clockType: "ClockIn",
     };
-    const instance = new TimeClock(loggerFactory);
+    const instance = new TimeClock(mockLogger());
 
     client.session.post.mockResolvedValue({ status: 200, data: "" });
 

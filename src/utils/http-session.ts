@@ -1,5 +1,6 @@
 import axios from "axios";
 import { USER_AGENT } from "../config";
+import { Logger } from "./logger-factory";
 
 export type PartOfRequestConfig = Pick<
   axios.AxiosRequestConfig,
@@ -10,7 +11,10 @@ export type PartOfRequestConfig = Pick<
  * Axiosのラッパ
  */
 export class HttpSession {
-  constructor(private axiosInstance: axios.AxiosInstance) {}
+  constructor(
+    private logger: Logger,
+    private axiosInstance: axios.AxiosInstance
+  ) {}
 
   /**
    * Axios get 呼びます
@@ -91,6 +95,8 @@ export class HttpSession {
   private request<T = any>(
     config: axios.AxiosRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
+    this.logger.trace(`METHOD: ${config.method}, URL: ${config.url}`);
+
     return this.axiosInstance.request({
       ...config,
       headers: {

@@ -1,4 +1,5 @@
 import axios, { AxiosHeaders, AxiosResponse } from "axios";
+import { mockLogger } from "../../../__helpers__/mock-helper";
 import { HttpSession } from "../../../src/utils/http-session";
 
 jest.mock("axios");
@@ -12,7 +13,7 @@ describe("HttpSession", () => {
 
   it("create instance", () => {
     // When
-    const instance = new HttpSession(mockedAxios);
+    const instance = new HttpSession(mockLogger(), mockedAxios);
 
     // Then
     expect(instance).toBeInstanceOf(HttpSession);
@@ -22,7 +23,7 @@ describe("HttpSession", () => {
     // Given
     const url = "https://example.com/top";
     const data = { data: "data" };
-    const instance = new HttpSession(mockedAxios);
+    const instance = new HttpSession(mockLogger(), mockedAxios);
 
     mockedAxios.request.mockResolvedValue({
       status: 200,
@@ -46,7 +47,7 @@ describe("HttpSession", () => {
     // Given
     const url = "https://example.com/top";
     const data = { data: "data" };
-    const instance = new HttpSession(mockedAxios);
+    const instance = new HttpSession(mockLogger(), mockedAxios);
 
     mockedAxios.request.mockResolvedValue({
       status: 200,
@@ -86,7 +87,7 @@ describe("HttpSession", () => {
       status: 200,
       headers: new AxiosHeaders(),
     };
-    const instance = new HttpSession(mockedAxios);
+    const instance = new HttpSession(mockLogger(), mockedAxios);
 
     // 各URLに対応したレスポンスを返す
     mockedAxios.request
@@ -104,15 +105,15 @@ describe("HttpSession", () => {
 
     expect(mockedAxios.request).toHaveBeenNthCalledWith(
       1,
-      expect.objectContaining({ url: url1 })
+      expect.objectContaining({ maxRedirects: 0, url: url1 })
     );
     expect(mockedAxios.request).toHaveBeenNthCalledWith(
       2,
-      expect.objectContaining({ url: url2 })
+      expect.objectContaining({ maxRedirects: 0, url: url2 })
     );
     expect(mockedAxios.request).toHaveBeenNthCalledWith(
       3,
-      expect.objectContaining({ url: url3 })
+      expect.objectContaining({ maxRedirects: 0, url: url3 })
     );
   });
 });
