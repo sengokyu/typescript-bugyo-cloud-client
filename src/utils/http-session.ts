@@ -1,23 +1,16 @@
 import axios from "axios";
-import { HttpCookieAgent, HttpsCookieAgent } from "http-cookie-agent/http";
-import { CookieJar } from "tough-cookie";
+import { USER_AGENT } from "../config";
 
-const DEFAULT_REQUEST_CONFIG: axios.AxiosRequestConfig = {
-  // リダイレクトは自前で処理
-  maxRedirects: 0,
-  // 302のときに、エラーにならないようにする
-  validateStatus: (status) => (status >= 200 && status < 300) || status === 302,
-};
+export type PartOfRequestConfig = Pick<
+  axios.AxiosRequestConfig,
+  "baseURL" | "headers" | "maxRedirects"
+>;
 
 /**
  * Axiosのラッパ
  */
 export class HttpSession {
-  private readonly session: axios.AxiosInstance;
-
-  constructor() {
-    this.session = this.createSession();
-  }
+  constructor(private axiosInstance: axios.AxiosInstance) {}
 
   /**
    * Axios get 呼びます
@@ -28,50 +21,82 @@ export class HttpSession {
    */
   public get<T = any>(
     url: string,
-    config?: axios.AxiosRequestConfig
+    config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.request({ method: "get", url, ...config });
+    return this.request({ ...config, method: "get", url });
+  }
+
+  /**
+   * Axios get 呼びます リダイレクトに追随
+   *
+   * @param url
+   * @param config
+   * @returns
+   */
+  public getAndFollow<T = any>(
+    url: string,
+    config?: PartOfRequestConfig
+  ): Promise<axios.AxiosResponse<T>> {
+    return this.requestAndFollow({ ...config, method: "get", url });
   }
 
   /**
    * Axios post 呼びます
+   * リダイレクト中の set-cookie が cookie jar に反映されない様子なので、
+   * 自前でリダイレクトを追いかける
    *
    * @param url
    * @param data
    * @param config
    * @returns
    */
-  public async post<T = any>(
+  public post<T = any>(
     url: string,
     data?: any,
-    config?: axios.AxiosRequestConfig
+    config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.request({ method: "post", url, data, ...config });
+    return this.request({ ...config, method: "post", url, data });
   }
 
-  public async request<T = any>(
+  private async requestAndFollow<T = any>(
     config: axios.AxiosRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
     let resp: axios.AxiosResponse<T>;
-    let nextUrl = config.url;
-    const actualConfig = { ...DEFAULT_REQUEST_CONFIG, config };
+    // For avoiding infinite loop
+    let redirectionCount = 5;
+    let url = config.url;
 
-    // リダイレクト中の set-cookie が動かない様子なので、
-    // 自前でリダイレクトを追いかける
+    const maxRedirects = 0;
+    // 302のときに、エラーにならないようにする
+    const validateStatus: axios.AxiosRequestConfig["validateStatus"] = (
+      status
+    ) => (status >= 200 && status < 300) || status === 302;
+
     do {
-      actualConfig.url = nextUrl;
-      resp = await this.session.request(actualConfig);
-    } while (resp.status === 302 && (nextUrl = resp.headers["location"]));
+      resp = await this.request({
+        ...config,
+        url,
+        maxRedirects,
+        validateStatus,
+      });
+    } while (
+      --redirectionCount > 0 &&
+      resp.status === 302 &&
+      (url = resp.headers["Location"])
+    );
 
     return resp;
   }
 
-  private createSession(): axios.AxiosInstance {
-    const jar = new CookieJar();
-
-    return axios.create({
-      httpAgent: new HttpCookieAgent({ cookies: { jar } }),
-      httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
+  private request<T = any>(
+    config: axios.AxiosRequestConfig
+  ): Promise<axios.AxiosResponse<T>> {
+    return this.axiosInstance.request({
+      ...config,
+      headers: {
+        "User-Agent": USER_AGENT,
+        ...config?.headers,
+      },
     });
   }
 }
