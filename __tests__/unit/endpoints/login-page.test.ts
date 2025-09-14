@@ -30,7 +30,7 @@ describe("LoginPage", () => {
 
     expect(client.session.get).toHaveBeenCalledWith(
       {
-        absoluteURL: `https://id.obc.jp/${tenantCode}`,
+        absoluteURL: `https://id.obc.jp/${tenantCode}/`,
         baseURL: "https://id.obc.jp/",
       },
       {

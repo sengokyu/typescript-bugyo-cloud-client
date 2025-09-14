@@ -10,6 +10,7 @@ import { OmRedirect } from "../../../src/endpoints/om-redirect";
 import { AuthInfo } from "../../../src/models/auth-info";
 import { LoginTask } from "../../../src/tasks/login-task";
 import { HttpSession } from "../../../src/utils/http-session";
+import { Logger } from "../../../dist/utils/logger-factory";
 
 describe("LoginTask", () => {
   beforeEach(() => {
@@ -42,7 +43,6 @@ describe("LoginTask", () => {
     const tenantCode = "ttttt";
     const token = "login page token";
     const userCode = "uuuuu";
-    const url = `https://example.com/${tenantCode}/${userCode}`;
     const loginPage = mockEndpointImplementation<LoginPage>();
     const checkAuthenticatedMethod =
       mockEndpointImplementation<CheckAuthenticationMethod>();
@@ -56,13 +56,17 @@ describe("LoginTask", () => {
       omRedirect,
       authInfo
     );
-    const client = new BugyoCloudClient(tenantCode, {} as HttpSession);
+    const client = new BugyoCloudClient(
+      {} as Logger,
+      tenantCode,
+      {} as HttpSession
+    );
     const userCodeSetter = jest.spyOn(client, "userCode", "set");
 
     loginPage.invoke.mockResolvedValue(token);
     checkAuthenticatedMethod.invoke.mockResolvedValue(undefined);
     authenticate.invoke.mockResolvedValue(undefined);
-    omRedirect.invoke.mockResolvedValue(url);
+    omRedirect.invoke.mockResolvedValue(userCode);
 
     // When
     const actualPromise = instance.execute(client);

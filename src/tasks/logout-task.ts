@@ -13,7 +13,7 @@ export class LogoutTask implements BaseTask {
   ) {}
 
   async execute(client: BugyoCloudClient): Promise<void> {
-    this.logger.debug("Trying to logout from BUGYO CLOUD.");
+    this.logger.trace("Invoking CallLogout.");
 
     await this.callLogout.invoke(client);
   }

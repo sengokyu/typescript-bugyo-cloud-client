@@ -17,9 +17,11 @@ export class PunchTask implements BaseTask {
   ) {}
 
   async execute(client: BugyoCloudClient): Promise<void> {
-    this.logger.trace("Trying to get the punchmark page token.");
+    this.logger.trace("Invoking PunchmarkPage.");
     const token = await this.punchmarkPage.invoke(client);
+    this.logger.debug("Got token: %s", token);
 
+    this.logger.trace("Invoking TimeClock.");
     await this.timeClock.invoke(client, token, this.punchInfo);
   }
 }

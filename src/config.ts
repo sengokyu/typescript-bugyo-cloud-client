@@ -1,10 +1,19 @@
-type formatter = (...values: Array<string>) => string;
+// テンプレートリテラルで使用できる名前
+type pathHolders = "tenantCode" | "userCode";
+type pathFormatter = (
+  values: Partial<{ [k in pathHolders]: string }>
+) => string;
+type UrlTemplate = {
+  [k in EndpointName]: Readonly<{
+    baseURL: string;
+    pathFormatter: pathFormatter;
+  }>;
+};
 
-const formatTag = (
-  strings: TemplateStringsArray,
-  ...keys: Array<number>
-): formatter => (...values) =>
-  strings[0] + keys.map((key, i) => values[key] + strings[i + 1]).join("");
+const pathTag =
+  (strings: TemplateStringsArray, ...keys: Array<pathHolders>): pathFormatter =>
+  (values) =>
+    strings[0] + keys.map((key, i) => values[key] + strings[i + 1]).join("");
 
 export type EndpointName =
   | "LoginPage"
@@ -16,15 +25,37 @@ export type EndpointName =
   | "TimeClock"
   | "CallLogout";
 
-export const USER_AGENT = "Mozilla 5.0 ()";
-export const URL_TEMPLATE: { [k in EndpointName]: formatter } = {
-  LoginPage: formatTag`https://id.obc.jp/${0}`,
-  CheckAuthenticationMethod: formatTag`https://id.obc.jp/${0}/login/CheckAuthenticationMethod`,
-  Authenticate: formatTag`https://id.obc.jp/${0}/login/login/`,
-  OmRedirect: formatTag`https://id.obc.jp/${0}/omredirect/redirect/`,
-  PunchmarkPage: formatTag`https://hromssp.obc.jp/${0}/${1}/timeclock/punchmark/`,
-  TimeClock: formatTag`https://hromssp.obc.jp/${0}/${1}/TimeClock/InsertReadDateTime/`,
-  CallLogout: formatTag`https://hromssp.obc.jp/${0}/${1}/calllogout/logout/?manuallogin=True`,
-};
+const BASE_AUTH_URL = "https://id.obc.jp/";
+const BASE_URL = "https://hromssp.obc.jp/";
 
-export const BASE_URL = "https://hromssp.obc.jp/";
+export const USER_AGENT = "Mozilla/5.0";
+export const URL_TEMPLATE: Readonly<UrlTemplate> = {
+  LoginPage: {
+    baseURL: BASE_AUTH_URL,
+    pathFormatter: pathTag`${"tenantCode"}/`,
+  },
+  CheckAuthenticationMethod: {
+    baseURL: BASE_AUTH_URL,
+    pathFormatter: pathTag`${"tenantCode"}/login/CheckAuthenticationMethod`,
+  },
+  Authenticate: {
+    baseURL: BASE_AUTH_URL,
+    pathFormatter: pathTag`${"tenantCode"}/login/login/`,
+  },
+  OmRedirect: {
+    baseURL: BASE_AUTH_URL,
+    pathFormatter: pathTag`${"tenantCode"}/omredirect/redirect/`,
+  },
+  PunchmarkPage: {
+    baseURL: BASE_URL,
+    pathFormatter: pathTag`${"tenantCode"}/${"userCode"}/timeclock/punchmark/`,
+  },
+  TimeClock: {
+    baseURL: BASE_URL,
+    pathFormatter: pathTag`${"tenantCode"}/${"userCode"}/TimeClock/InsertReadDateTime/`,
+  },
+  CallLogout: {
+    baseURL: BASE_URL,
+    pathFormatter: pathTag`${"tenantCode"}/${"userCode"}/calllogout/logout/?manuallogin=True`,
+  },
+};

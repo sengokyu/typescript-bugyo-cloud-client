@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from "axios";
 import { BugyoCloudClient } from "../../bugyo-cloud-client";
 import { EndpointName } from "../../config";
-import { parseToken } from "../../utils/page-token-parser";
+import { parseToken } from "../../utils/page-parser";
 import { produceUrl } from "../../utils/url-utils";
 import { BaseEndpoint } from "./base-endpoint";
 
@@ -18,7 +18,7 @@ export abstract class TokenPage extends BaseEndpoint {
       maxRedirects: 0,
     };
 
-    this.logger.debug("Trying to GET. url=%s", url);
+    this.logger.debug("Getting %s.", this.EndpointName);
 
     const resp = await client.session.get(url, config);
 

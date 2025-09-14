@@ -12,11 +12,12 @@ describe("OmRedirect", () => {
     const instance = new OmRedirect(mockLogger());
     const tenantCode = "ttttttt";
     const client = { tenantCode, session: { getAndFollow: jest.fn() } };
-    const url = "https://example.com/xxx/yyy/ddd";
+    const userCode = "uuuuuuu";
+    const data = `<a id="ApplicationRoot" href="/tenantCode/${userCode}/"></a>`;
 
     client.session.getAndFollow.mockResolvedValue({
       status: 200,
-      config: { url },
+      data,
     });
 
     // When
@@ -25,7 +26,7 @@ describe("OmRedirect", () => {
     );
 
     // Then
-    await expect(actualPromise).resolves.toBe(url);
+    await expect(actualPromise).resolves.toBe(userCode);
 
     expect(client.session.getAndFollow).toHaveBeenCalledWith(
       {
@@ -33,7 +34,7 @@ describe("OmRedirect", () => {
         baseURL: "https://id.obc.jp/",
       },
       {
-        headers: { Referer: `https://id.obc.jp/${tenantCode}` },
+        headers: { Referer: `https://id.obc.jp/${tenantCode}/` },
       }
     );
   });

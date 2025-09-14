@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from "axios";
 import qs from "querystring";
 import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { AuthInfo } from "../models/auth-info";
@@ -20,15 +19,15 @@ export class Authenticate extends BaseEndpoint {
   ): Promise<void> {
     const url = produceUrl("Authenticate", client);
     const data = this.createData(token, authInfo);
-    const config: AxiosRequestConfig = {
+
+    this.logger.trace("Posting Authenticate.");
+
+    const resp = await client.session.post(url, data, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        "X-Requested-With": "XMLHttpRequest",
       },
-    };
-
-    this.logger.trace("Trying to Authenticate.");
-
-    const resp = await client.session.post(url, data, config);
+    });
 
     this.throwIfNgStatus(resp);
 

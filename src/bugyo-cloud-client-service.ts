@@ -20,13 +20,17 @@ import { HttpSession } from "./utils/http-session";
 import { Logger, LoggerFactory } from "./utils/logger-factory";
 
 /**
- * Creating a instance service
+ * Create instances
  */
 export class BugyoCloudClientService {
   constructor(private loggerFactory: LoggerFactory) {}
 
   public createClient(tenantCode: string): BugyoCloudClient {
-    return new BugyoCloudClient(tenantCode, this.createHttpSession());
+    return new BugyoCloudClient(
+      this.getLogger(BugyoCloudClient),
+      tenantCode,
+      this.createHttpSession()
+    );
   }
 
   public createLoginTask(authInfo: AuthInfo): BaseTask {

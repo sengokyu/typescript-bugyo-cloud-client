@@ -5,7 +5,6 @@ import { LoginPage } from "../endpoints/login-page";
 import { OmRedirect } from "../endpoints/om-redirect";
 import { AuthInfo } from "../models/auth-info";
 import { Logger } from "../utils/logger-factory";
-import { extractUserCode } from "../utils/url-utils";
 import { BaseTask } from "./base/base-task";
 
 /**
@@ -22,18 +21,20 @@ export class LoginTask implements BaseTask {
   ) {}
 
   async execute(client: BugyoCloudClient): Promise<void> {
-    this.logger.trace("Trying to get the login page token.");
+    this.logger.trace("Invoking Loginpage.");
     const token = await this.loginPage.invoke(client);
+    this.logger.debug("Got token: %s", token);
 
-    this.logger.trace("Trying to check authentication method.");
+    this.logger.trace("Invoking CheckAuthenticationMethod.");
     await this.checkAuthenticationMethod.invoke(client, token, this.authInfo);
 
-    this.logger.trace("Trying to authenticate.");
+    this.logger.trace("Invoking Authenticate.");
     await this.authenticate.invoke(client, token, this.authInfo);
 
-    this.logger.trace("Trying to get the redirect url.");
-    const url = await this.omRedirect.invoke(client);
+    this.logger.trace("Invoking OmRedirect.");
+    const userCode = await this.omRedirect.invoke(client);
+    this.logger.debug("Got userCode: %s", userCode);
 
-    client.userCode = extractUserCode(url);
+    client.userCode = userCode;
   }
 }

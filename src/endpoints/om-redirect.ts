@@ -1,5 +1,6 @@
 import { AxiosRequestConfig } from "axios";
-import { BugyoCloudClient, BugyoCloudClientError } from "../bugyo-cloud-client";
+import { BugyoCloudClient } from "../bugyo-cloud-client";
+import { parseUserCode } from "../utils/page-parser";
 import { produceUrl } from "../utils/url-utils";
 import { BaseEndpoint } from "./base/base-endpoint";
 
@@ -8,7 +9,8 @@ import { BaseEndpoint } from "./base/base-endpoint";
  */
 export class OmRedirect extends BaseEndpoint {
   /**
-   * いったんワンタイムトークンを挟んでトップページに至ります
+   * いったんワンタイムトークンを挟んでトップページに至ります。
+   * userCode を返します。
    *
    * @param client
    */
@@ -21,18 +23,12 @@ export class OmRedirect extends BaseEndpoint {
       },
     };
 
-    this.logger.trace("Trying to move the top page.", url);
+    this.logger.trace("Getting OmRedirect.");
 
     const resp = await client.session.getAndFollow(url, config);
 
     this.throwIfNgStatus(resp);
 
-    if (!resp.config.url) {
-      throw new BugyoCloudClientError("Cannot retrieve the top page URL.");
-    }
-
-    this.logger.debug("Get the top page URL. url=%s", resp.config.url);
-
-    return resp.config.url!;
+    return parseUserCode(resp.data);
   }
 }

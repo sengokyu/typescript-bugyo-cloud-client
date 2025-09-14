@@ -21,7 +21,7 @@ export class CheckAuthenticationMethod extends BaseEndpoint {
     const data = this.createData(authInfo);
     const config = this.createConfig(token);
 
-    this.logger.trace("Trying to check authentication method");
+    this.logger.trace("Posting CheckAuthenticationMethod.");
 
     const resp = await client.session.post(url, data, config);
 
