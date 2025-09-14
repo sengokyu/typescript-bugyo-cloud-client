@@ -17,11 +17,11 @@ export class OmRedirect extends BaseEndpoint {
     const referer = produceUrl("LoginPage", client);
     const config: AxiosRequestConfig = {
       headers: {
-        Referer: referer,
+        Referer: referer.absoluteURL,
       },
     };
 
-    this.logger.debug("Trying to GET, url=%s", url);
+    this.logger.trace("Trying to move the top page.", url);
 
     const resp = await client.session.getAndFollow(url, config);
 
@@ -30,6 +30,8 @@ export class OmRedirect extends BaseEndpoint {
     if (!resp.config.url) {
       throw new BugyoCloudClientError("Cannot retrieve the top page URL.");
     }
+
+    this.logger.debug("Get the top page URL. url=%s", resp.config.url);
 
     return resp.config.url!;
   }

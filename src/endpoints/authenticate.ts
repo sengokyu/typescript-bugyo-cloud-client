@@ -26,13 +26,13 @@ export class Authenticate extends BaseEndpoint {
       },
     };
 
-    this.logger.debug("Trying to POST, url=%s", url, data, config);
+    this.logger.trace("Trying to Authenticate.");
 
     const resp = await client.session.post(url, data, config);
 
     this.throwIfNgStatus(resp);
 
-    this.logger.info("Authenticate succeed.");
+    this.logger.trace("Authenticate succeed.");
   }
 
   private createData(token: string, authInfo: AuthInfo): string {

@@ -9,13 +9,12 @@ export class CallLogout extends BaseEndpoint {
   async invoke(client: BugyoCloudClient): Promise<void> {
     const url = produceUrl("CallLogout", client);
 
-    this.logger.debug("Trying to GET. url=%s", url);
+    this.logger.trace("Trying to logout");
 
     const resp = await client.session.get(url);
 
     this.throwIfNgStatus(resp);
 
-    this.logger.info("CallLogout succeed");
+    this.logger.trace("CallLogout succeed.");
   }
 }
-

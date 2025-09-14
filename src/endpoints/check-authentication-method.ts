@@ -21,13 +21,13 @@ export class CheckAuthenticationMethod extends BaseEndpoint {
     const data = this.createData(authInfo);
     const config = this.createConfig(token);
 
-    this.logger.debug("Trying to POST, url=%s", url, data, config);
+    this.logger.trace("Trying to check authentication method");
 
     const resp = await client.session.post(url, data, config);
 
     this.throwIfNgStatus(resp);
 
-    this.logger.info("CheckAuthenticationMethod succeed.");
+    this.logger.trace("CheckAuthenticationMethod succeed.");
   }
 
   private createData(authInfo: AuthInfo) {

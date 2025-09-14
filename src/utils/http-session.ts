@@ -1,6 +1,7 @@
 import axios from "axios";
 import { USER_AGENT } from "../config";
 import { Logger } from "./logger-factory";
+import { PrettyUrl } from "../models/pretty-url";
 
 export type PartOfRequestConfig = Pick<
   axios.AxiosRequestConfig,
@@ -24,10 +25,15 @@ export class HttpSession {
    * @returns
    */
   public get<T = any>(
-    url: string,
+    url: PrettyUrl,
     config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.request({ ...config, method: "get", url });
+    return this.request({
+      ...config,
+      method: "get",
+      url: url.absoluteURL,
+      baseURL: url.baseURL,
+    });
   }
 
   /**
@@ -38,16 +44,19 @@ export class HttpSession {
    * @returns
    */
   public getAndFollow<T = any>(
-    url: string,
+    url: PrettyUrl,
     config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.requestAndFollow({ ...config, method: "get", url });
+    return this.requestAndFollow({
+      ...config,
+      method: "get",
+      url: url.absoluteURL,
+      baseURL: url.baseURL,
+    });
   }
 
   /**
    * Axios post 呼びます
-   * リダイレクト中の set-cookie が cookie jar に反映されない様子なので、
-   * 自前でリダイレクトを追いかける
    *
    * @param url
    * @param data
@@ -55,13 +64,28 @@ export class HttpSession {
    * @returns
    */
   public post<T = any>(
-    url: string,
+    url: PrettyUrl,
     data?: any,
     config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.request({ ...config, method: "post", url, data });
+    return this.request({
+      ...config,
+      method: "post",
+      url: url.absoluteURL,
+      baseURL: url.baseURL,
+      data,
+    });
   }
 
+  /**
+   * Axios 呼び出す
+   *
+   * リダイレクト中の set-cookie が cookie jar に反映されない様子なので、
+   * 自前でリダイレクトを追いかける
+   *
+   * @param config
+   * @returns
+   */
   private async requestAndFollow<T = any>(
     config: axios.AxiosRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
@@ -86,7 +110,7 @@ export class HttpSession {
     } while (
       --redirectionCount > 0 &&
       resp.status === 302 &&
-      (url = resp.headers["Location"])
+      (url = resp.headers["location"])
     );
 
     return resp;
