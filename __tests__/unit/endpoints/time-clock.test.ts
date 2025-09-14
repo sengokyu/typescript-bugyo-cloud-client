@@ -52,7 +52,10 @@ describe("TimeClock", () => {
       Referer: `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`,
     };
     expect(client.session.post).toHaveBeenCalledWith(
-      expectedUrl,
+      {
+        absoluteURL: expectedUrl,
+        baseURL: "https://hromssp.obc.jp/",
+      },
       expectedData,
       {
         headers: expectedHeaders,

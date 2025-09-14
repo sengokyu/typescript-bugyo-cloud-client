@@ -34,7 +34,10 @@ describe("PunchmarkPage", () => {
     await expect(actualPromise).resolves.toBe("my token");
 
     expect(client.session.get).toHaveBeenCalledWith(
-      `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`,
+      {
+        absoluteURL: `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`,
+        baseURL: "https://hromssp.obc.jp/",
+      },
       {
         responseType: "text",
         maxRedirects: 0,

@@ -40,7 +40,10 @@ describe("Authenticate", () => {
       "X-Requested-With=XMLHttpRequest",
     ].join("&");
     expect(client.session.post).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}/login/login/`,
+      {
+        absoluteURL: `https://id.obc.jp/${tenantCode}/login/login/`,
+        baseURL: "https://id.obc.jp/",
+      },
       expectedData,
       {
         headers: {

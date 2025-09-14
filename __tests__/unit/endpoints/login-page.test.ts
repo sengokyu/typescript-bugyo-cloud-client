@@ -29,7 +29,10 @@ describe("LoginPage", () => {
     await expect(actualPromise).resolves.toBe("my token");
 
     expect(client.session.get).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}`,
+      {
+        absoluteURL: `https://id.obc.jp/${tenantCode}`,
+        baseURL: "https://id.obc.jp/",
+      },
       {
         responseType: "text",
         maxRedirects: 0,

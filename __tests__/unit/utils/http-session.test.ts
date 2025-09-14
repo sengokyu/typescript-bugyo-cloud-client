@@ -8,7 +8,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("HttpSession", () => {
   beforeEach(() => {
-    mockedAxios.request.mockClear();
+    jest.clearAllMocks();
   });
 
   it("create instance", () => {
@@ -21,7 +21,10 @@ describe("HttpSession", () => {
 
   it("http getします", async () => {
     // Given
-    const url = "https://example.com/top";
+    const url = {
+      absoluteURL: "https://example.com/top",
+      baseURL: "https://example.com",
+    };
     const data = { data: "data" };
     const instance = new HttpSession(mockLogger(), mockedAxios);
 
@@ -38,14 +41,17 @@ describe("HttpSession", () => {
     expect(mockedAxios.request).toHaveBeenCalledWith(
       expect.objectContaining({
         method: "get",
-        url,
+        url: url.absoluteURL,
       })
     );
   });
 
   it("http postします", async () => {
     // Given
-    const url = "https://example.com/top";
+    const url = {
+      absoluteURL: "https://example.com/top",
+      baseURL: "https://example.com",
+    };
     const data = { data: "data" };
     const instance = new HttpSession(mockLogger(), mockedAxios);
 
@@ -62,7 +68,7 @@ describe("HttpSession", () => {
     expect(mockedAxios.request).toHaveBeenCalledWith(
       expect.objectContaining({
         method: "post",
-        url,
+        url: url.absoluteURL,
         data,
       })
     );
@@ -77,11 +83,11 @@ describe("HttpSession", () => {
     const url3 = "https://example.com/3";
     const resp1: Res = {
       status: 302,
-      headers: { Location: url2 },
+      headers: { location: url2 },
     };
     const resp2: Res = {
       status: 302,
-      headers: { Location: url3 },
+      headers: { location: url3 },
     };
     const resp3: Res = {
       status: 200,
@@ -96,7 +102,10 @@ describe("HttpSession", () => {
       .mockResolvedValueOnce(resp3);
 
     // When
-    const actualPromise = instance.getAndFollow(url1);
+    const actualPromise = instance.getAndFollow({
+      absoluteURL: url1,
+      baseURL: "https://example.com/",
+    });
 
     // Then
     await expect(actualPromise).resolves.toBe(resp3);

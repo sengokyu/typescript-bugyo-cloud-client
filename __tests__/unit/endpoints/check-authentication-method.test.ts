@@ -33,7 +33,10 @@ describe("CheckAuthenticationMethod", () => {
     // Then
     await expect(actualPromise).resolves.toBeUndefined();
     expect(client.session.post).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}/login/CheckAuthenticationMethod`,
+      {
+        absoluteURL: `https://id.obc.jp/${tenantCode}/login/CheckAuthenticationMethod`,
+        baseURL: "https://id.obc.jp/",
+      },
       {
         OBCiD: loginId,
         isBugyoCloud: "false",

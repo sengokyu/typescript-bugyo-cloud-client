@@ -28,7 +28,10 @@ describe("OmRedirect", () => {
     await expect(actualPromise).resolves.toBe(url);
 
     expect(client.session.getAndFollow).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}/omredirect/redirect/`,
+      {
+        absoluteURL: `https://id.obc.jp/${tenantCode}/omredirect/redirect/`,
+        baseURL: "https://id.obc.jp/",
+      },
       {
         headers: { Referer: `https://id.obc.jp/${tenantCode}` },
       }
