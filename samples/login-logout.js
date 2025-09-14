@@ -22,12 +22,13 @@ const main = async () => {
   const password = process.argv.pop();
   const loginId = process.argv.pop();
   const tenantCode = process.argv.pop();
-  const clockType = "ClockIn";
 
-  const loginTask = new bcc.LoginTask({ loginId, password }, loggerFactory);
-  const logoutTask = new bcc.LogoutTask(loggerFactory);
+  const service = new bcc.BugyoCloudClientService(loggerFactory);
 
-  const client = new bcc.BugyoCloudClient(tenantCode);
+  const loginTask = service.createLoginTask({ loginId, password });
+  const logoutTask = service.createLogoutTask(loggerFactory);
+
+  const client = service.createClient(tenantCode);
 
   await client.doA(loginTask);
   await client.doA(logoutTask);
