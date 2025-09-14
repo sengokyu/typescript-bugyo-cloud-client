@@ -7,7 +7,7 @@ describe("produceUrl", () => {
   const userCode = "uuu";
 
   it.each([
-    ["LoginPage", "https://id.obc.jp/", `https://id.obc.jp/${tenantCode}`],
+    ["LoginPage", "https://id.obc.jp/", `https://id.obc.jp/${tenantCode}/`],
     [
       "TimeClock",
       "https://hromssp.obc.jp/",

@@ -1,4 +1,5 @@
-import { parseToken } from "../../../src/utils/page-token-parser";
+import { parseToken } from "../../../src/utils/page-parser";
+
 describe("parseToken", (): void => {
   const CONTENT = `
   <form id="loginform" action="http://example.com/">

@@ -31,3 +31,31 @@ export const parseToken = (html: string): string => {
 
   return val;
 };
+
+/**
+ * ページ中にある #ApplicationRoot の href 属性から userCode を返します。
+ *
+ * @param html
+ * @returns
+ */
+export const parseUserCode = (html: string): string => {
+  const $ = load(html);
+  const href = $("#ApplicationRoot")?.attr("href");
+
+  if (!href) {
+    throw new BugyoCloudClientError(
+      "Cannot find a element of #ApplicationRoot."
+    );
+  }
+
+  // /{tenantCode}/{userCode}/
+  const parts = href.split("/");
+
+  if (!parts[2]) {
+    throw new BugyoCloudClientError(
+      `Cannot parse userCode from #ApplicationRoot. href=${href}`
+    );
+  }
+
+  return parts[2];
+};

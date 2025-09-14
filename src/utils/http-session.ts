@@ -12,6 +12,8 @@ export type PartOfRequestConfig = Pick<
  * Axiosのラッパ
  */
 export class HttpSession {
+  private lastUrl?: string;
+
   constructor(
     private logger: Logger,
     private axiosInstance: axios.AxiosInstance
@@ -24,16 +26,20 @@ export class HttpSession {
    * @param config
    * @returns
    */
-  public get<T = any>(
+  public async get<T = any>(
     url: PrettyUrl,
     config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.request({
+    const resp = await this.request({
       ...config,
       method: "get",
       url: url.absoluteURL,
       baseURL: url.baseURL,
     });
+
+    this.lastUrl = resp.config?.url;
+
+    return resp;
   }
 
   /**
@@ -43,16 +49,20 @@ export class HttpSession {
    * @param config
    * @returns
    */
-  public getAndFollow<T = any>(
+  public async getAndFollow<T = any>(
     url: PrettyUrl,
     config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.requestAndFollow({
+    const resp = await this.requestAndFollow({
       ...config,
       method: "get",
       url: url.absoluteURL,
       baseURL: url.baseURL,
     });
+
+    this.lastUrl = resp.config?.url;
+
+    return resp;
   }
 
   /**
@@ -68,13 +78,20 @@ export class HttpSession {
     data?: any,
     config?: PartOfRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    return this.request({
+    const newconfig = {
       ...config,
       method: "post",
       url: url.absoluteURL,
       baseURL: url.baseURL,
       data,
-    });
+    };
+
+    if (this.lastUrl) {
+      newconfig.headers ??= {};
+      newconfig.headers.Referer = this.lastUrl;
+    }
+
+    return this.request(newconfig);
   }
 
   /**
@@ -116,17 +133,25 @@ export class HttpSession {
     return resp;
   }
 
-  private request<T = any>(
+  private async request<T = any>(
     config: axios.AxiosRequestConfig
   ): Promise<axios.AxiosResponse<T>> {
-    this.logger.trace(`METHOD: ${config.method}, URL: ${config.url}`);
-
-    return this.axiosInstance.request({
+    const newconfig = {
       ...config,
       headers: {
         "User-Agent": USER_AGENT,
         ...config?.headers,
       },
-    });
+    };
+
+    this.logger.debug("Method: %s", newconfig.method);
+    this.logger.debug("URL: %s", newconfig.url);
+    this.logger.debug("Headers: %s", newconfig.headers);
+
+    const resp = await this.axiosInstance.request(newconfig);
+
+    this.logger.debug("Status: %s", resp.status);
+
+    return resp;
   }
 }
