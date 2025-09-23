@@ -22,24 +22,26 @@
   "author": "sengokyu",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@tsconfig/node22": "^22.0.2",
+    "@tsconfig/node24": "^24.0.1",
     "@types/bunyan": "^1.8.8",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.18.0",
+    "@types/node": "^24.5.2",
     "@types/tough-cookie": "^4.0.2",
     "@typescript-eslint/eslint-plugin": "^8.42.0",
     "@typescript-eslint/parser": "^8.42.0",
+    "babel-jest": "^30.1.2",
     "eslint": "^9.34.0",
     "jest": "^30.1.3",
     "typescript": "^5.1.3"
   },
   "peerDependencies": {
-    "axios": "^1.4.0",
     "cheerio": "^1.0.0-rc.12",
     "http-cookie-agent": "^7.0.2",
     "temporal-polyfill": "^0.3.0",
-    "tough-cookie": "^5.1.2"
+    "tough-cookie": "^5.1.2",
+    "undici": "^7.0.0"
   }
 }
