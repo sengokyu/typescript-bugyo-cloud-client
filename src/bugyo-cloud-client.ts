@@ -45,5 +45,3 @@ export class BugyoCloudClient implements ClientParam {
     return task.execute(this);
   }
 }
-
-export class BugyoCloudClientError extends Error {}
