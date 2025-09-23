@@ -22,7 +22,7 @@ const punchTask = new bcc.PunchTask({ clockType: "ClockIn" }, loggerFactory);
 const logoutTask = new bcc.LogoutTask(loggerFactory);
 
 // Create a client
-const client = new bcc.BugyoCloudClient(tenantCode);
+const client = bcc.createBugyoCloudClient(tenantCode);
 
 // Do tasks
 await client.doA(loginTask); // At first, must do login
@@ -30,7 +30,11 @@ await client.doA(punchTask);
 await client.doA(logoutTask);
 ```
 
-See a [sample](/samples/clock-in.js).
+See a samples.
+
+- [login and logout](./samples/login-logout.js)
+- [clock in](./samples/clock-in.js)
+- [clock out](./samples//clock-out.js)
 
 # Testing
 
@@ -137,7 +141,7 @@ npm run sample TenantCode LoginId Password
 
 ## 打刻画面
 
-- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/timeclock/punchmark/
+- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユニーク文字列？}}/timeclock/punchmark/
 - METHOD: GET
 - Response:
   - Headers:
@@ -145,7 +149,7 @@ npm run sample TenantCode LoginId Password
 
 ## 打刻
 
-- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/TimeClock/InsertReadDateTime/
+- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユニーク文字列？}}}/TimeClock/InsertReadDateTime/
 - METHOD: POST
 - Headers:
   - "\_\_RequestVerificationToken": 打刻画面にある input hidden value
@@ -172,12 +176,12 @@ npm run sample TenantCode LoginId Password
 
 ## ログアウト
 
-- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/calllogout/logout/?manuallogin=True
+- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユニーク文字列}}/calllogout/logout/?manuallogin=True
 - METHOD: GET
 
 ## 申請
 
-- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユーザ初期画面URLより}}/Workflow/Apply/
+- URL: https://hromssp.obc.jp/{{テナント？}}/{{ユニーク文字列}}/Workflow/Apply/
 - METHOD: POST
 - Headers:
   - Content-Type: multipart/form-data
