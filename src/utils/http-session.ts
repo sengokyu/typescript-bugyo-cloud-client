@@ -1,12 +1,12 @@
-import axios from "axios";
+import * as undici from "undici";
 import { USER_AGENT } from "../config";
 import { Logger } from "./logger-factory";
-import { PrettyUrl } from "../models/pretty-url";
+import { HeaderRecord } from "undici/types/header";
 
-export type PartOfRequestConfig = Pick<
-  axios.AxiosRequestConfig,
-  "baseURL" | "headers" | "maxRedirects"
->;
+export type PartOfRequestConfig = {
+  headers?: HeaderRecord;
+  redirect?: undici.RequestInit["redirect"];
+};
 
 /**
  * Axiosのラッパ
@@ -14,143 +14,78 @@ export type PartOfRequestConfig = Pick<
 export class HttpSession {
   private lastUrl?: string;
 
-  constructor(
-    private logger: Logger,
-    private axiosInstance: axios.AxiosInstance
-  ) {}
+  constructor(private logger: Logger, private dispatcher: undici.Dispatcher) {}
 
   /**
-   * Axios get 呼びます
-   *
+   * HTTP GET して、bodyを文字列で返す
    * @param url
    * @param config
-   * @returns
    */
-  public async get<T = any>(
-    url: PrettyUrl,
+  public async getPage(
+    url: string,
     config?: PartOfRequestConfig
-  ): Promise<axios.AxiosResponse<T>> {
-    const resp = await this.request({
-      ...config,
-      method: "get",
-      url: url.absoluteURL,
-      baseURL: url.baseURL,
-    });
+  ): Promise<string> {
+    const resp = await this.request("GET", url, config);
+    const text = await resp.text();
 
-    this.lastUrl = resp.config?.url;
+    this.lastUrl = resp.url;
 
-    return resp;
+    return text;
   }
 
   /**
-   * Axios get 呼びます リダイレクトに追随
+   * HTTP GET します
    *
    * @param url
    * @param config
    * @returns
    */
-  public async getAndFollow<T = any>(
-    url: PrettyUrl,
+  public get(
+    url: string,
     config?: PartOfRequestConfig
-  ): Promise<axios.AxiosResponse<T>> {
-    const resp = await this.requestAndFollow({
-      ...config,
-      method: "get",
-      url: url.absoluteURL,
-      baseURL: url.baseURL,
-    });
-
-    this.lastUrl = resp.config?.url;
-
-    return resp;
+  ): Promise<undici.Response> {
+    return this.request("GET", url, config);
   }
 
   /**
-   * Axios post 呼びます
+   * HTTP POST します
    *
    * @param url
-   * @param data
+   * @param body
    * @param config
    * @returns
    */
-  public post<T = any>(
-    url: PrettyUrl,
-    data?: any,
+  public post(
+    url: string,
+    body?: undici.RequestInit["body"],
     config?: PartOfRequestConfig
-  ): Promise<axios.AxiosResponse<T>> {
-    const newconfig = {
+  ): Promise<undici.Response> {
+    return this.request("POST", url, config, body);
+  }
+
+  private async request(
+    method: undici.RequestInit["method"],
+    url: string,
+    config: PartOfRequestConfig = {},
+    body?: undici.RequestInit["body"]
+  ): Promise<undici.Response> {
+    config.headers = config.headers ?? {};
+    config.headers["User-Agent"] = USER_AGENT;
+
+    const init: undici.RequestInit = {
+      method,
       ...config,
-      method: "post",
-      url: url.absoluteURL,
-      baseURL: url.baseURL,
-      data,
+      dispatcher: this.dispatcher,
+      referrer: this.lastUrl,
+      body,
     };
 
-    if (this.lastUrl) {
-      newconfig.headers ??= {};
-      newconfig.headers.Referer = this.lastUrl;
+    const resp = await undici.fetch(url, init);
+
+    if (!resp.ok) {
+      this.logger.error("HTTP error! status: %s, url: %s", resp.status, url);
+      throw new Error(`HTTP error! status: ${resp.status}`);
     }
-
-    return this.request(newconfig);
-  }
-
-  /**
-   * Axios 呼び出す
-   *
-   * リダイレクト中の set-cookie が cookie jar に反映されない様子なので、
-   * 自前でリダイレクトを追いかける
-   *
-   * @param config
-   * @returns
-   */
-  private async requestAndFollow<T = any>(
-    config: axios.AxiosRequestConfig
-  ): Promise<axios.AxiosResponse<T>> {
-    let resp: axios.AxiosResponse<T>;
-    // For avoiding infinite loop
-    let redirectionCount = 5;
-    let url = config.url;
-
-    const maxRedirects = 0;
-    // 302のときに、エラーにならないようにする
-    const validateStatus: axios.AxiosRequestConfig["validateStatus"] = (
-      status
-    ) => (status >= 200 && status < 300) || status === 302;
-
-    do {
-      resp = await this.request({
-        ...config,
-        url,
-        maxRedirects,
-        validateStatus,
-      });
-    } while (
-      --redirectionCount > 0 &&
-      resp.status === 302 &&
-      (url = resp.headers["location"])
-    );
-
-    return resp;
-  }
-
-  private async request<T = any>(
-    config: axios.AxiosRequestConfig
-  ): Promise<axios.AxiosResponse<T>> {
-    const newconfig = {
-      ...config,
-      headers: {
-        "User-Agent": USER_AGENT,
-        ...config?.headers,
-      },
-    };
-
-    this.logger.debug("Method: %s", newconfig.method);
-    this.logger.debug("URL: %s", newconfig.url);
-    this.logger.debug("Headers: %s", newconfig.headers);
-
-    const resp = await this.axiosInstance.request(newconfig);
-
-    this.logger.debug("Status: %s", resp.status);
 
     return resp;
   }
