@@ -2,6 +2,7 @@ import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { TimeClock } from "../../../src/endpoints/time-clock";
 import { PunchInfo } from "../../../src/models/punch-info";
+import * as undici from "undici";
 
 describe("TimeClock", () => {
   afterEach(() => {
@@ -49,17 +50,12 @@ describe("TimeClock", () => {
       __RequestVerificationToken: token,
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "X-Requested-With": "XMLHttpRequest",
-      Referer: `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`,
     };
     expect(client.session.post).toHaveBeenCalledWith(
-      {
-        absoluteURL: expectedUrl,
-        baseURL: "https://hromssp.obc.jp/",
-      },
+      expectedUrl,
       expectedData,
       {
         headers: expectedHeaders,
-        maxRedirects: 0,
       }
     );
   });

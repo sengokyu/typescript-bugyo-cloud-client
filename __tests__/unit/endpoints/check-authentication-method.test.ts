@@ -20,8 +20,11 @@ describe("CheckAuthenticationMethod", () => {
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
     const instance = new CheckAuthenticationMethod(mockLogger());
+    const response = { ok: true, json: jest.fn() };
+    const json = { AuthenticationMethod: 1 };
 
-    client.session.post.mockResolvedValue({ status: 200, data: "" });
+    response.json.mockResolvedValue(json);
+    client.session.post.mockResolvedValue(response);
 
     // When
     const actualPromise = instance.invoke(
@@ -33,20 +36,15 @@ describe("CheckAuthenticationMethod", () => {
     // Then
     await expect(actualPromise).resolves.toBeUndefined();
     expect(client.session.post).toHaveBeenCalledWith(
-      {
-        absoluteURL: `https://id.obc.jp/${tenantCode}/login/CheckAuthenticationMethod`,
-        baseURL: "https://id.obc.jp/",
-      },
-      {
-        OBCiD: loginId,
-        isBugyoCloud: "false",
-      },
+      `https://id.obc.jp/${tenantCode}/login/CheckAuthenticationMethod`,
+      `OBCiD=${encodeURIComponent(loginId)}&isBugyoCloud=false`,
       {
         headers: {
           __RequestVerificationToken: token,
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
           "X-Requested-With": "XMLHttpRequest",
         },
-        maxRedirects: 0,
+        redirect: "error",
       }
     );
   });

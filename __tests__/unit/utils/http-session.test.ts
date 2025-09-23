@@ -1,19 +1,21 @@
-import axios, { AxiosHeaders, AxiosResponse } from "axios";
+import * as undici from "undici";
 import { mockLogger } from "../../../__helpers__/mock-helper";
 import { HttpSession } from "../../../src/utils/http-session";
 
-jest.mock("axios");
+jest.mock("undici");
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedFetch = undici.fetch as jest.MockedFunction<typeof undici.fetch>;
 
 describe("HttpSession", () => {
+  const dispatcher = {} as undici.Dispatcher;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("create instance", () => {
     // When
-    const instance = new HttpSession(mockLogger(), mockedAxios);
+    const instance = new HttpSession(mockLogger(), dispatcher);
 
     // Then
     expect(instance).toBeInstanceOf(HttpSession);
@@ -21,108 +23,71 @@ describe("HttpSession", () => {
 
   it("http getします", async () => {
     // Given
-    const url = {
-      absoluteURL: "https://example.com/top",
-      baseURL: "https://example.com",
-    };
-    const data = { data: "data" };
-    const instance = new HttpSession(mockLogger(), mockedAxios);
+    const url = "https://example.com/top";
+    const instance = new HttpSession(mockLogger(), dispatcher);
+    const response = { ok: true } as undici.Response;
 
-    mockedAxios.request.mockResolvedValue({
-      status: 200,
-      data,
-    });
+    mockedFetch.mockResolvedValue(response);
 
     // When
     const actualPromise = instance.get(url);
 
     // Then
-    expect(actualPromise).resolves.toStrictEqual({ status: 200, data });
-    expect(mockedAxios.request).toHaveBeenCalledWith(
+    expect(actualPromise).resolves.toBe(response);
+    expect(mockedFetch).toHaveBeenCalledWith(
+      url,
       expect.objectContaining({
-        method: "get",
-        url: url.absoluteURL,
+        method: "GET",
+        dispatcher: dispatcher,
+      })
+    );
+  });
+
+  it("http getしてコンテンツ返します", async () => {
+    // Given
+    const url = "https://example.com/top";
+    const instance = new HttpSession(mockLogger(), dispatcher);
+    const response = { ok: true, text: jest.fn() };
+    const text = "<html></html>";
+
+    response.text.mockResolvedValue(text);
+    mockedFetch.mockResolvedValue(response as unknown as undici.Response);
+
+    // When
+    const actualPromise = instance.getPage(url);
+
+    // Then
+    expect(actualPromise).resolves.toBe(text);
+    expect(mockedFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        method: "GET",
+        dispatcher: dispatcher,
       })
     );
   });
 
   it("http postします", async () => {
     // Given
-    const url = {
-      absoluteURL: "https://example.com/top",
-      baseURL: "https://example.com",
-    };
-    const data = { data: "data" };
-    const instance = new HttpSession(mockLogger(), mockedAxios);
+    const url = "https://example.com/top";
+    const data = '{ data: "data" }';
+    const instance = new HttpSession(mockLogger(), dispatcher);
+    const response = { ok: true } as undici.Response;
 
-    mockedAxios.request.mockResolvedValue({
-      status: 200,
-      data,
-    });
+    mockedFetch.mockResolvedValue(response);
 
     // When
     const actualPromise = instance.post(url, data);
 
     // Then
-    expect(actualPromise).resolves.toStrictEqual({ status: 200, data });
-    expect(mockedAxios.request).toHaveBeenCalledWith(
+    expect(actualPromise).resolves.toBe(response);
+    expect(mockedFetch).toHaveBeenCalledWith(
+      url,
       expect.objectContaining({
-        method: "post",
-        url: url.absoluteURL,
-        data,
+        method: "POST",
+        body: data,
+        dispatcher: dispatcher,
       })
-    );
-  });
-
-  it("リダイレクトに追随します", async () => {
-    type Res = Pick<AxiosResponse, "status" | "headers">;
-
-    // Given
-    const url1 = "https://example.com/1";
-    const url2 = "https://example.com/2";
-    const url3 = "https://example.com/3";
-    const resp1: Res = {
-      status: 302,
-      headers: { location: url2 },
-    };
-    const resp2: Res = {
-      status: 302,
-      headers: { location: url3 },
-    };
-    const resp3: Res = {
-      status: 200,
-      headers: new AxiosHeaders(),
-    };
-    const instance = new HttpSession(mockLogger(), mockedAxios);
-
-    // 各URLに対応したレスポンスを返す
-    mockedAxios.request
-      .mockResolvedValueOnce(resp1)
-      .mockResolvedValueOnce(resp2)
-      .mockResolvedValueOnce(resp3);
-
-    // When
-    const actualPromise = instance.getAndFollow({
-      absoluteURL: url1,
-      baseURL: "https://example.com/",
-    });
-
-    // Then
-    await expect(actualPromise).resolves.toBe(resp3);
-
-    expect(mockedAxios.request).toHaveBeenCalledTimes(3);
-
-    expect(mockedAxios.request).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({ maxRedirects: 0, url: url1 })
-    );
-    expect(mockedAxios.request).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ maxRedirects: 0, url: url2 })
-    );
-    expect(mockedAxios.request).toHaveBeenNthCalledWith(
-      3,
-      expect.objectContaining({ maxRedirects: 0, url: url3 })
     );
   });
 });

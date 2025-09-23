@@ -18,8 +18,9 @@ describe("Authenticate", () => {
     const authInfo: AuthInfo = { loginId, password };
     const instance = new Authenticate(mockLogger());
 
+    client.session.post.mockResolvedValue(undefined);
+
     // When
-    client.session.post.mockResolvedValue({ status: 200 });
     const actualPromise = instance.invoke(
       client as unknown as BugyoCloudClient,
       token,
@@ -40,10 +41,7 @@ describe("Authenticate", () => {
       "X-Requested-With=XMLHttpRequest",
     ].join("&");
     expect(client.session.post).toHaveBeenCalledWith(
-      {
-        absoluteURL: `https://id.obc.jp/${tenantCode}/login/login/`,
-        baseURL: "https://id.obc.jp/",
-      },
+      `https://id.obc.jp/${tenantCode}/login/login/`,
       expectedData,
       {
         headers: {

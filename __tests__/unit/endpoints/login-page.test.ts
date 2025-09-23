@@ -10,7 +10,7 @@ describe("LoginPage", () => {
   it("トークンを返します", async () => {
     // Given
     const tenantCode = "ttt";
-    const client = { tenantCode, session: { get: jest.fn() } };
+    const client = { tenantCode, session: { getPage: jest.fn() } };
     const instance = new LoginPage(mockLogger());
     const data = `
     <form action="http://example.com/">
@@ -18,7 +18,7 @@ describe("LoginPage", () => {
     </form>
     `;
 
-    client.session.get.mockResolvedValue({ status: 200, data });
+    client.session.getPage.mockResolvedValue(data);
 
     // When
     const actualPromise = instance.invoke(
@@ -28,15 +28,8 @@ describe("LoginPage", () => {
     // Then
     await expect(actualPromise).resolves.toBe("my token");
 
-    expect(client.session.get).toHaveBeenCalledWith(
-      {
-        absoluteURL: `https://id.obc.jp/${tenantCode}/`,
-        baseURL: "https://id.obc.jp/",
-      },
-      {
-        responseType: "text",
-        maxRedirects: 0,
-      }
+    expect(client.session.getPage).toHaveBeenCalledWith(
+      `https://id.obc.jp/${tenantCode}/`
     );
   });
 });

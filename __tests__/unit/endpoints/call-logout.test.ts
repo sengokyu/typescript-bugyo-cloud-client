@@ -1,3 +1,4 @@
+import * as undici from "undici";
 import { mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { CallLogout } from "../../../src/endpoints/call-logout";
@@ -19,7 +20,7 @@ describe("Logout", () => {
     const client = { tenantCode, userCode, session: { get: jest.fn() } };
     const instance = new CallLogout(mockLogger());
 
-    client.session.get.mockResolvedValue({ status: 200 });
+    client.session.get.mockResolvedValue({} as undici.Response);
 
     // When
     const actualPromise = instance.invoke(
@@ -28,9 +29,8 @@ describe("Logout", () => {
 
     await expect(actualPromise).resolves.toBeUndefined();
 
-    expect(client.session.get).toHaveBeenCalledWith({
-      absoluteURL: `https://hromssp.obc.jp/${tenantCode}/${userCode}/calllogout/logout/?manuallogin=True`,
-      baseURL: "https://hromssp.obc.jp/",
-    });
+    expect(client.session.get).toHaveBeenCalledWith(
+      `https://hromssp.obc.jp/${tenantCode}/${userCode}/calllogout/logout/?manuallogin=True`
+    );
   });
 });

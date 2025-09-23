@@ -14,7 +14,7 @@ describe("PunchmarkPage", () => {
     const client = {
       tenantCode,
       userCode,
-      session: { get: jest.fn() },
+      session: { getPage: jest.fn() },
     };
     const instance = new PunchmarkPage(mockLogger());
     const data = `
@@ -23,7 +23,7 @@ describe("PunchmarkPage", () => {
     </form>
     `;
 
-    client.session.get.mockResolvedValue({ status: 200, data });
+    client.session.getPage.mockResolvedValue(data);
 
     // When
     const actualPromise = instance.invoke(
@@ -33,15 +33,8 @@ describe("PunchmarkPage", () => {
     // Then
     await expect(actualPromise).resolves.toBe("my token");
 
-    expect(client.session.get).toHaveBeenCalledWith(
-      {
-        absoluteURL: `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`,
-        baseURL: "https://hromssp.obc.jp/",
-      },
-      {
-        responseType: "text",
-        maxRedirects: 0,
-      }
+    expect(client.session.getPage).toHaveBeenCalledWith(
+      `https://hromssp.obc.jp/${tenantCode}/${userCode}/timeclock/punchmark/`
     );
   });
 });
