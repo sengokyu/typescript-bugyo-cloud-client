@@ -1,4 +1,4 @@
-import qs from "querystring";
+import * as qs from "querystring";
 import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { AuthInfo } from "../models/auth-info";
 import { produceUrl } from "../utils/url-utils";
@@ -19,17 +19,16 @@ export class Authenticate extends BaseEndpoint {
   ): Promise<void> {
     const url = produceUrl("Authenticate", client);
     const data = this.createData(token, authInfo);
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Requested-With": "XMLHttpRequest",
+    };
 
     this.logger.trace("Posting Authenticate.");
 
-    const resp = await client.session.post(url, data, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-Requested-With": "XMLHttpRequest",
-      },
+    await client.session.post(url, data, {
+      headers,
     });
-
-    this.throwIfNgStatus(resp);
 
     this.logger.trace("Authenticate succeed.");
   }

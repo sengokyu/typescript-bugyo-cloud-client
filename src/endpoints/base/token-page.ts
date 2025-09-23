@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from "axios";
 import { BugyoCloudClient } from "../../bugyo-cloud-client";
 import { EndpointName } from "../../config";
 import { parseToken } from "../../utils/page-parser";
@@ -13,19 +12,13 @@ export abstract class TokenPage extends BaseEndpoint {
 
   public async invoke(client: BugyoCloudClient): Promise<string> {
     const url = produceUrl(this.EndpointName, client);
-    const config: AxiosRequestConfig = {
-      responseType: "text",
-      maxRedirects: 0,
-    };
 
     this.logger.debug("Getting %s.", this.EndpointName);
 
-    const resp = await client.session.get(url, config);
-
-    this.throwIfNgStatus(resp);
+    const text = await client.session.getPage(url);
 
     this.logger.info("%s succeed.", this.EndpointName);
 
-    return parseToken(resp.data);
+    return parseToken(text);
   }
 }

@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from "axios";
 import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { parseUserCode } from "../utils/page-parser";
 import { produceUrl } from "../utils/url-utils";
@@ -16,19 +15,11 @@ export class OmRedirect extends BaseEndpoint {
    */
   async invoke(client: BugyoCloudClient): Promise<string> {
     const url = produceUrl("OmRedirect", client);
-    const referer = produceUrl("LoginPage", client);
-    const config: AxiosRequestConfig = {
-      headers: {
-        Referer: referer.absoluteURL,
-      },
-    };
 
     this.logger.trace("Getting OmRedirect.");
 
-    const resp = await client.session.getAndFollow(url, config);
+    const text = await client.session.getPage(url);
 
-    this.throwIfNgStatus(resp);
-
-    return parseUserCode(resp.data);
+    return parseUserCode(text);
   }
 }

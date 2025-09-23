@@ -1,9 +1,8 @@
-import qs from "querystring";
+import * as qs from "querystring";
 import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { PunchInfo } from "../models/punch-info";
 import { produceUrl } from "../utils/url-utils";
 import { BaseEndpoint } from "./base/base-endpoint";
-
 /**
  * 打刻します。
  */
@@ -14,32 +13,24 @@ export class TimeClock extends BaseEndpoint {
     punchInfo: PunchInfo
   ): Promise<void> {
     const url = produceUrl("TimeClock", client);
-    const config = {
-      headers: this.createHeaders(client, token),
-      maxRedirects: 0,
-    };
+    const headers = this.createHeaders(token);
     const data = this.createData(punchInfo);
 
     this.logger.trace("Trying to call TimeClock.");
 
-    const resp = await client.session.post(url, data, config);
-
-    this.throwIfNgStatus(resp);
+    await client.session.post(url, data, {
+      headers,
+    });
 
     this.logger.trace("TimeClock succeed.");
   }
 
-  private createHeaders(client: BugyoCloudClient, token: string): any {
+  private createHeaders(token: string) {
     return {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      Referer: this.getRefererUrl(client),
       __RequestVerificationToken: token,
       "X-Requested-With": "XMLHttpRequest",
     };
-  }
-
-  private getRefererUrl(client: BugyoCloudClient): string {
-    return produceUrl("PunchmarkPage", client).absoluteURL;
   }
 
   private createData(punchInfo: PunchInfo): string {

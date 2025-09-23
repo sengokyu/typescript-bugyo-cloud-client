@@ -11,9 +11,7 @@ export class CallLogout extends BaseEndpoint {
 
     this.logger.trace("Trying to logout");
 
-    const resp = await client.session.get(url);
-
-    this.throwIfNgStatus(resp);
+    await client.session.get(url);
 
     this.logger.trace("CallLogout succeed.");
   }
