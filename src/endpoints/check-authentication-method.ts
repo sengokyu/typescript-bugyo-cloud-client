@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import * as qs from "querystring";
 import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { AuthInfo } from "../models/auth-info";
 import { produceUrl } from "../utils/url-utils";
@@ -19,32 +19,39 @@ export class CheckAuthenticationMethod extends BaseEndpoint {
   ): Promise<void> {
     const url = produceUrl("CheckAuthenticationMethod", client);
     const data = this.createData(authInfo);
-    const config = this.createConfig(token);
+    const headers = {
+      __RequestVerificationToken: token,
+      "X-Requested-With": "XMLHttpRequest",
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    };
 
     this.logger.trace("Posting CheckAuthenticationMethod.");
 
-    const resp = await client.session.post(url, data, config);
+    // エラーがあるとリダイレクトするので、リダイレクトさせない
+    const resp = await client.session.post(url, data, {
+      headers,
+      redirect: "error",
+    });
 
-    this.throwIfNgStatus(resp);
+    const json = (await resp.json()) as any;
+
+    if ("AuthenticationMethod" in json === false) {
+      this.logger.error(
+        "CheckAuthenticationMethod response does not contain AuthenticationMethod.",
+        { response: json }
+      );
+      throw new Error(
+        "CheckAuthenticationMethod response does not contain AuthenticationMethod."
+      );
+    }
 
     this.logger.trace("CheckAuthenticationMethod succeed.");
   }
 
   private createData(authInfo: AuthInfo) {
-    return {
+    return qs.stringify({
       OBCiD: authInfo.loginId,
       isBugyoCloud: "false",
-    };
-  }
-
-  private createConfig(token: string): AxiosRequestConfig {
-    // エラーがあるとリダイレクトするので、リダイレクトさせない
-    return {
-      headers: {
-        __RequestVerificationToken: token,
-        "X-Requested-With": "XMLHttpRequest",
-      },
-      maxRedirects: 0,
-    };
+    });
   }
 }
