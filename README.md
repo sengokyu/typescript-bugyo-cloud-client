@@ -16,13 +16,16 @@ const tenantCode = "Bugyo cloud tenant code";
 const loginId = "Your login id";
 const password = "Your password";
 
+// Create service
+const service = new bcc.BugyoCloudClientService(loggerFactory);
+
 // Create tasks
-const loginTask = new bcc.LoginTask({ loginId, password }, loggerFactory);
-const punchTask = new bcc.PunchTask({ clockType: "ClockIn" }, loggerFactory);
-const logoutTask = new bcc.LogoutTask(loggerFactory);
+const loginTask = service.createLoginTask({ loginId, password });
+const punchTask = service.createPunchTask({ clockType: "ClockIn" });
+const logoutTask = service.createLogoutTask();
 
 // Create a client
-const client = bcc.createBugyoCloudClient(tenantCode);
+const client = service.createClient(tenantCode);
 
 // Do tasks
 await client.doA(loginTask); // At first, must do login
