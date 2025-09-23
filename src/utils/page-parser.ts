@@ -1,5 +1,4 @@
 import { load } from "cheerio";
-import { BugyoCloudClientError } from "../bugyo-cloud-client";
 
 /**
  * ページ中にある__RequestVerificationTokenを返します。
@@ -10,23 +9,19 @@ export const parseToken = (html: string): string => {
   const ele = $("input[name=__RequestVerificationToken]");
 
   if (ele.length === 0) {
-    new BugyoCloudClientError(
-      "Cannot find a element of __RequestVerificationToken."
-    );
+    throw new Error("Cannot find a element of __RequestVerificationToken.");
   }
 
   const val = ele.val();
 
   if (val === undefined) {
-    throw new BugyoCloudClientError(
+    throw new Error(
       "Cannot get a value attribute of the __RequestVerificationToken."
     );
   }
 
   if (Array.isArray(val)) {
-    throw new BugyoCloudClientError(
-      "Too many __RequestVerificationToken input fields. "
-    );
+    throw new Error("Too many __RequestVerificationToken input fields. ");
   }
 
   return val;
@@ -43,16 +38,14 @@ export const parseUserCode = (html: string): string => {
   const href = $("#ApplicationRoot")?.attr("href");
 
   if (!href) {
-    throw new BugyoCloudClientError(
-      "Cannot find a element of #ApplicationRoot."
-    );
+    throw new Error("Cannot find a element of #ApplicationRoot.");
   }
 
   // /{tenantCode}/{userCode}/
   const parts = href.split("/");
 
   if (!parts[2]) {
-    throw new BugyoCloudClientError(
+    throw new Error(
       `Cannot parse userCode from #ApplicationRoot. href=${href}`
     );
   }
