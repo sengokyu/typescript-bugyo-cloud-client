@@ -1,5 +1,4 @@
-import axios from "axios";
-import { HttpCookieAgent, HttpsCookieAgent } from "http-cookie-agent/http";
+import { CookieAgent } from "http-cookie-agent/undici";
 import { CookieJar } from "tough-cookie";
 import { BugyoCloudClient } from "./bugyo-cloud-client";
 import { Authenticate } from "./endpoints/authenticate";
@@ -61,19 +60,16 @@ export class BugyoCloudClientService {
   }
 
   private createHttpSession(): HttpSession {
-    return new HttpSession(
-      this.getLogger(HttpSession),
-      this.createAxiosInstance()
-    );
-  }
-
-  private createAxiosInstance(): axios.AxiosInstance {
     const jar = new CookieJar();
+    // const agent = new ProxyAgent({
+    //   uri: "http://127.0.0.1:9000",
+    //   // Do not verify TLS certificates.
+    //   requestTls: { rejectUnauthorized: false },
+    // }).compose(cookie({ jar }));
 
-    return axios.create({
-      httpAgent: new HttpCookieAgent({ cookies: { jar } }),
-      httpsAgent: new HttpsCookieAgent({ cookies: { jar } }),
-    });
+    const agent = new CookieAgent({ cookies: { jar } });
+
+    return new HttpSession(this.getLogger(HttpSession), agent);
   }
 
   private createEndpointInstance<T extends BaseEndpoint>(
