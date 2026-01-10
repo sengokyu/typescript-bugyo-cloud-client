@@ -55,6 +55,8 @@ npm run sample TenantCode LoginId Password
 
 **2025-9-1 更新**
 
+**2026-1-9 更新**
+
 ## 認証画面
 
 - URL: https://id.obc.jp/{{テナント?}}/
@@ -72,7 +74,7 @@ npm run sample TenantCode LoginId Password
   - Content-Type: application/x-www-form-urlencoded; charset=UTF-8
   - X-Requested-With: XMLHttpRequest
 - Content:
-  - "OBCiD" : ログイン ID
+  - "OBCiD" : "ログイン ID"
   - "isBugyoCloud" : "false"
 - Response:
   - Status: 200
@@ -92,20 +94,32 @@ npm run sample TenantCode LoginId Password
   - Content-Type: application/x-www-form-urlencoded; charset=UTF-8
 - Content:
   - "btnLogin" : ""
-  - "OBCID" : ログイン ID
+  - "OBCID" : "ログイン ID"
   - "Password_d1" : ""
   - "Password_d2" : ""
   - "Password_d3" : ""
-  - "Password" : パスワード
+  - "Password" : "パスワード"
   - "\_\_RequestVerificationToken" : 認証画面のフォームにある input hidden value
   - "X-Requested-With" : "XMLHttpRequest"
 - Response:
   - Status: 200
   - Headers:
     - Content-Type: application/json; charset=utf-8
-  - Content: 空
+  - Content:
+    - "RedirectURL": "新規セッション開始リダイレクト URL"
+    - "LoginOBCiD": "ログイン ID"
 
 **2025-9-1 以前は、ここでリダイレクト先 URL を取得できました。**
+**2026-1-9 以降、ここで新規セッション開始 URL が返ってきます。**
+
+## 新規セッション開始（？） **2026-1-9 より**
+
+- URL: （上記「認証」で返ってきた RedirectURL）
+- METHOD: GET
+- Response:
+  - Status: 302
+  - Headers:
+    - Location: ワンタイムトークン URL 取得 URL
 
 ## ワンタイムトークン URL 取得
 
