@@ -28,7 +28,7 @@ const main = async () => {
 
   const loginTask = service.createLoginTask({ loginId, password });
   const logoutTask = service.createLogoutTask(loggerFactory);
-  const punchTask = service.PunchTask({ clockType });
+  const punchTask = service.createPunchTask({ clockType });
 
   const client = service.createClient(tenantCode);
 
@@ -43,4 +43,10 @@ const main = async () => {
 
 main()
   .then(() => console.log("Succeed."))
-  .catch((reason) => console.log(reason));
+  .catch((reason) => {
+    console.log(reason);
+
+    if (errors in reason) {
+      console.log(reason.errors);
+    }
+  });
