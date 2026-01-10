@@ -17,3 +17,16 @@ export function mockLogger(): Logger {
     error: jest.fn(),
   };
 }
+
+/**
+ * モック関数を作成します
+ * @param expectedArguments 期待する引数
+ * @param returnValue 戻り値
+ * @returns
+ */
+export function mockFnImpl(expectedArguments: any[], returnValue: any) {
+  return jest.fn((...args: any[]) => {
+    expect(args).toEqual(expectedArguments);
+    return returnValue;
+  });
+}
