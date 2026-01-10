@@ -29,10 +29,14 @@ export class LoginTask implements BaseTask {
     await this.checkAuthenticationMethod.invoke(client, token, this.authInfo);
 
     this.logger.trace("Invoking Authenticate.");
-    await this.authenticate.invoke(client, token, this.authInfo);
+    const redirectUrl = await this.authenticate.invoke(
+      client,
+      token,
+      this.authInfo
+    );
 
     this.logger.trace("Invoking OmRedirect.");
-    const userCode = await this.omRedirect.invoke(client);
+    const userCode = await this.omRedirect.invoke(client, redirectUrl);
     this.logger.debug("Got userCode: %s", userCode);
 
     client.userCode = userCode;

@@ -1,6 +1,5 @@
 import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { parseUserCode } from "../utils/page-parser";
-import { produceUrl } from "../utils/url-utils";
 import { BaseEndpoint } from "./base/base-endpoint";
 
 /**
@@ -13,10 +12,8 @@ export class OmRedirect extends BaseEndpoint {
    *
    * @param client
    */
-  async invoke(client: BugyoCloudClient): Promise<string> {
-    const url = produceUrl("OmRedirect", client);
-
-    this.logger.trace("Getting OmRedirect.");
+  async invoke(client: BugyoCloudClient, url: string): Promise<string> {
+    this.logger.trace("Getting OmRedirect: %s.", url);
 
     const text = await client.session.getPage(url);
 

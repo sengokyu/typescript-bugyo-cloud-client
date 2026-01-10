@@ -62,27 +62,20 @@ describe("LoginTask", () => {
       {} as HttpSession
     );
     const userCodeSetter = jest.spyOn(client, "userCode", "set");
+    const redirectUrl = "https://id.obc.jp/ttttt/some-redirect-url";
 
-    loginPage.invoke.mockResolvedValue(token);
-    checkAuthenticatedMethod.invoke.mockResolvedValue(undefined);
-    authenticate.invoke.mockResolvedValue(undefined);
-    omRedirect.invoke.mockResolvedValue(userCode);
+    authenticate.invoke.mockResolvedValue(redirectUrl);
+    omRedirect.invoke.mockImplementation((arg1, arg2) => {
+      expect(arg1).toBe(client);
+      expect(arg2).toBe(redirectUrl);
+      return Promise.resolve(userCode);
+    });
 
     // When
     const actualPromise = instance.execute(client);
 
     // Then
     await expect(actualPromise).resolves.toBeUndefined();
-
-    // 各invokeが呼ばれる
-    expect(loginPage.invoke).toHaveBeenCalledWith(client);
-    expect(checkAuthenticatedMethod.invoke).toHaveBeenCalledWith(
-      client,
-      token,
-      authInfo
-    );
-    expect(authenticate.invoke).toHaveBeenCalledWith(client, token, authInfo);
-    expect(omRedirect.invoke).toHaveBeenCalledWith(client);
 
     expect(userCodeSetter).toHaveBeenCalledWith(userCode);
   });

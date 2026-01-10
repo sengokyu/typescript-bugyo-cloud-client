@@ -1,4 +1,4 @@
-import { mockLogger } from "../../../__helpers__/mock-helper";
+import { mockFnImpl, mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { Authenticate } from "../../../src/endpoints/authenticate";
 import { AuthInfo } from "../../../src/models/auth-info";
@@ -11,25 +11,13 @@ describe("Authenticate", () => {
   it("認証情報をPOSTします", async () => {
     // Given
     const tenantCode = "ttt";
-    const client = { tenantCode, session: { post: jest.fn() } };
     const token = "my token";
     const loginId = "log in";
     const password = "pa ss";
     const authInfo: AuthInfo = { loginId, password };
     const instance = new Authenticate(mockLogger());
-
-    client.session.post.mockResolvedValue(undefined);
-
-    // When
-    const actualPromise = instance.invoke(
-      client as unknown as BugyoCloudClient,
-      token,
-      authInfo
-    );
-
-    // Then
-    await expect(actualPromise).resolves.toBeUndefined();
-
+    const redirectUrl = "https://id.obc.jp/ttt/some-redirect-url";
+    const url = `https://id.obc.jp/${tenantCode}/login/login/`;
     const expectedData = [
       "btnLogin=",
       "OBCID=log%20in",
@@ -40,15 +28,33 @@ describe("Authenticate", () => {
       "__RequestVerificationToken=my%20token",
       "X-Requested-With=XMLHttpRequest",
     ].join("&");
-    expect(client.session.post).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}/login/login/`,
-      expectedData,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      }
+    const expectedOptions = {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    };
+    const mockResult = {
+      json: () => Promise.resolve({ RedirectURL: redirectUrl }),
+    };
+    const client = {
+      tenantCode,
+      session: {
+        post: mockFnImpl(
+          [url, expectedData, expectedOptions],
+          Promise.resolve(mockResult)
+        ),
+      },
+    };
+
+    // When
+    const actual = await instance.invoke(
+      client as unknown as BugyoCloudClient,
+      token,
+      authInfo
     );
+
+    // Then
+    expect(actual).toBe(redirectUrl);
   });
 });

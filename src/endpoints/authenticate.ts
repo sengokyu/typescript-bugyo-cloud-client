@@ -3,6 +3,7 @@ import { BugyoCloudClient } from "../bugyo-cloud-client";
 import { AuthInfo } from "../models/auth-info";
 import { produceUrl } from "../utils/url-utils";
 import { BaseEndpoint } from "./base/base-endpoint";
+import { isAuthenticationResponse } from "../types";
 
 export class Authenticate extends BaseEndpoint {
   /**
@@ -16,7 +17,7 @@ export class Authenticate extends BaseEndpoint {
     client: BugyoCloudClient,
     token: string,
     authInfo: AuthInfo
-  ): Promise<void> {
+  ): Promise<string> {
     const url = produceUrl("Authenticate", client);
     const data = this.createData(token, authInfo);
     const headers = {
@@ -24,13 +25,22 @@ export class Authenticate extends BaseEndpoint {
       "X-Requested-With": "XMLHttpRequest",
     };
 
-    this.logger.trace("Posting Authenticate.");
+    this.logger.trace("Posting Authenticate: %s.", url);
 
-    await client.session.post(url, data, {
+    const response = await client.session.post(url, data, {
       headers,
     });
 
+    const result = await response.json();
+
+    if (!isAuthenticationResponse(result)) {
+      this.logger.error("Unexpected authentication response. %s", result);
+      throw new Error("Unexpected authentication response.");
+    }
+
     this.logger.trace("Authenticate succeed.");
+
+    return result.RedirectURL;
   }
 
   private createData(token: string, authInfo: AuthInfo): string {

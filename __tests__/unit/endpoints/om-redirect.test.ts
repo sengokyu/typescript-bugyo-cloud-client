@@ -1,4 +1,4 @@
-import { mockLogger } from "../../../__helpers__/mock-helper";
+import { mockFnImpl, mockLogger } from "../../../__helpers__/mock-helper";
 import { BugyoCloudClient } from "../../../src/bugyo-cloud-client";
 import { OmRedirect } from "../../../src/endpoints/om-redirect";
 
@@ -11,22 +11,21 @@ describe("OmRedirect", () => {
     // Given
     const instance = new OmRedirect(mockLogger());
     const tenantCode = "ttttttt";
-    const client = { tenantCode, session: { getPage: jest.fn() } };
+    const url = "https://id.obc.jp/ttttttt/omredirect/redirect/";
     const userCode = "uuuuuuu";
     const data = `<a id="ApplicationRoot" href="/tenantCode/${userCode}/"></a>`;
-
-    client.session.getPage.mockResolvedValue(data);
+    const client = {
+      tenantCode,
+      session: { getPage: mockFnImpl([url], Promise.resolve(data)) },
+    };
 
     // When
     const actualPromise = instance.invoke(
-      client as unknown as BugyoCloudClient
+      client as unknown as BugyoCloudClient,
+      url
     );
 
     // Then
     await expect(actualPromise).resolves.toBe(userCode);
-
-    expect(client.session.getPage).toHaveBeenCalledWith(
-      `https://id.obc.jp/${tenantCode}/omredirect/redirect/`
-    );
   });
 });
