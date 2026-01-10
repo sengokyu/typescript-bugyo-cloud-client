@@ -13,7 +13,7 @@ export abstract class TokenPage extends BaseEndpoint {
   public async invoke(client: BugyoCloudClient): Promise<string> {
     const url = produceUrl(this.EndpointName, client);
 
-    this.logger.debug("Getting %s.", this.EndpointName);
+    this.logger.debug("Getting %s: %s.", this.EndpointName, url);
 
     const text = await client.session.getPage(url);
 

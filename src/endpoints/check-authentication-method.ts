@@ -25,7 +25,7 @@ export class CheckAuthenticationMethod extends BaseEndpoint {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
     };
 
-    this.logger.trace("Posting CheckAuthenticationMethod.");
+    this.logger.trace("Posting CheckAuthenticationMethod: %s.", url);
 
     // エラーがあるとリダイレクトするので、リダイレクトさせない
     const resp = await client.session.post(url, data, {
